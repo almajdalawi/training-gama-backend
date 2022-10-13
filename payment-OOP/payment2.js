@@ -119,6 +119,16 @@ function bank(cashBalance, creditBalance) {
      * @returns A message of the product's name and price and the new balance of the bank account.
      */
     function buy(theProduct, accountType) {
+        const props = Object.getOwnPropertyNames(theProduct)
+        let isProduct = true
+        props.forEach(element => {
+            if (!(theProduct.hasOwnProperty(element))) {
+                isProduct = false
+            }
+            if (isProduct) {
+                return "Product not found, Please enter the product's object!"
+            }
+        })
         if (!(theProduct.hasOwnProperty('name') && theProduct.hasOwnProperty('price'))) {
             return "Product not found, Please enter the product's object!"
         }
