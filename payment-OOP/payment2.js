@@ -74,12 +74,13 @@ function bank(cashBalance, creditBalance) {
      */
     function deposit(amount, accountType) {
         if (typeof (amount) != 'number') return 'Please enter a number!'
+        if (accountType == null) return 'Please enter the type of the account ("cash" or "credit")'
 
-        if (accountType == 'cash' || accountType == 'Cash') {
+        if (accountType.toLowerCase() == 'cash') {
             cashBalance += amount
             return `Successfull, $${amount} has been added to your cash account, the current cash balance is $${cashBalance}`
         }
-        else if (accountType == 'credit' || accountType == 'Credit') {
+        else if (accountType.toLowerCase() == 'credit') {
             creditBalance += amount
             return `Successfull, $${amount} has been added to your cash account, the current credit balance is $${creditBalance}`
         }
@@ -94,15 +95,16 @@ function bank(cashBalance, creditBalance) {
      */
     function withdraw(amount, accountType) {
         if (typeof (amount) != 'number') return 'Please enter a number!'
+        if (accountType == null) return 'Please enter the type of the account ("cash" or "credit")'
 
-        if (accountType == 'cash' || accountType == 'Cash') {
+        if (accountType.toLowerCase() == 'cash') {
             if (cashBalance >= amount) {
                 cashBalance -= amount
                 return `Successfull, $${amount} has been subtracted from your cash account, the current cash balance is $${cashBalance}`
             }
             else return `You can't widraw $${amount}, your current cash balance is $${cashBalance}`
         }
-        else if (accountType == 'credit' || accountType == 'Credit') {
+        else if (accountType.toLowerCase() == 'credit') {
             if (creditBalance >= amount) {
                 creditBalance -= amount
                 return `Successfull, $${amount} has been subtracted from  your cash account, the current credit balance is $${creditBalance}`
@@ -119,6 +121,8 @@ function bank(cashBalance, creditBalance) {
      * @returns A message of the product's name and price and the new balance of the bank account.
      */
     function buy(theProduct, accountType) {
+        if (accountType == null) return 'Please enter the type of the account ("cash" or "credit")'
+
         const props = Object.getOwnPropertyNames(theProduct)
         let isProduct = true
         props.forEach(element => {
@@ -133,14 +137,14 @@ function bank(cashBalance, creditBalance) {
             return "Product not found, Please enter the product's object!"
         }
 
-        if (accountType == 'cash' || accountType == 'Cash') {
+        if (accountType.toLowerCase() == 'cash') {
             if (cashBalance >= theProduct.price) {
                 cashBalance = cashBalance - theProduct.price
                 return `Payment succeded, you bought a ${theProduct.name} for $${theProduct.price}, and your cash balance now is $${cashBalance}`
             }
             else return `The cash balance is $${cashBalance}, which is not sufficient to buy ${theProduct.name}, its price is $${theProduct.price}`
         }
-        else if (accountType == 'credit' || accountType == 'Credit') {
+        else if (accountType.toLowerCase() == 'credit') {
             if (creditBalance >= theProduct.price) {
                 creditBalance = creditBalance - theProduct.price
                 return `Payment succeded, you bought a ${theProduct.name} for $${theProduct.price}, and your cash balance now is $${creditBalance}`

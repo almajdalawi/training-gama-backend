@@ -83,12 +83,13 @@ class Bank {
      */
     deposit(amount, accountType) {
         if (typeof (amount) != 'number') return 'Please enter a number!'
+        if (accountType == null) return 'Please enter the type of the account ("cash" or "credit")'
 
-        if (accountType == 'cash' || accountType == 'Cash') {
+        if (accountType.toLowerCase() == 'cash') {
             this.cashBalance += amount
             return `Successfull, $${amount} has been added to your cash account, the current cash balance is $${this.cashBalance}`
         }
-        else if (accountType == 'credit' || accountType == 'Credit') {
+        else if (accountType.toLowerCase() == 'credit') {
             this.creditBalance += amount
             return `Successfull, $${amount} has been added to your cash account, the current credit balance is $${this.creditBalance}`
         }
@@ -103,15 +104,16 @@ class Bank {
      */
     withdraw(amount, accountType) {
         if (typeof (amount) != 'number') return 'Please enter a number!'
+        if (accountType == null) return 'Please enter the type of the account ("cash" or "credit")'
 
-        if (accountType == 'cash' || accountType == 'Cash') {
+        if (accountType.toLowerCase() == 'cash') {
             if (this.cashBalance >= amount) {
                 this.cashBalance -= amount
                 return `Successfull, $${amount} has been subtracted from your cash account, the current cash balance is $${this.cashBalance}`
             }
             else return `You can't widraw $${amount}, your current cash balance is $${this.cashBalance}`
         }
-        else if (accountType == 'credit' || accountType == 'Credit') {
+        else if (accountType.toLowerCase() == 'credit') {
             if (this.creditBalance >= amount) {
                 this.creditBalance -= amount
                 return `Successfull, $${amount} has been subtracted from  your cash account, the current credit balance is $${this.creditBalance}`
@@ -128,16 +130,17 @@ class Bank {
      * @returns A message of the product's name and price and the new balance of the bank account.
      */
     buy(product, accountType) {
+        if (accountType == null) return 'Please enter the type of the account ("cash" or "credit")'
         if (!(product instanceof Product)) return "Product not found, Please enter the product's object!"
 
-        if (accountType == 'cash' || accountType == 'Cash') {
+        if (accountType.toLowerCase() == 'cash') {
             if (this.cashBalance >= product.price) {
                 this.cashBalance = this.cashBalance - product.price
                 return `Payment succeded, you bought a ${product.name} for $${product.price}, and your cash balance now is $${this.cashBalance}`
             }
             else return `The cash balance is $${this.cashBalance}, which is not sufficient to buy ${product.name}, its price is $${product.price}`
         }
-        else if (accountType == 'credit' || accountType == 'Credit') {
+        else if (accountType.toLowerCase() == 'credit') {
             if (this.creditBalance >= product.price) {
                 this.creditBalance = this.creditBalance - product.price
                 return `Payment succeded, you bought a ${product.name} for $${product.price}, and your cash balance now is $${this.creditBalance}`
