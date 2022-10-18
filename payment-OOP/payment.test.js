@@ -38,7 +38,6 @@ describe('Bank', () => {
         expect(mohammad.bankAccount.deposit(50)).toEqual('Please enter the type of the account ("cash" or "credit")');
         expect(mohammad.bankAccount.deposit(50, 'cashhhh')).toEqual('Please enter a correct type of the account ("cash" or "credit")');
 
-
         expect(mohammad.bankAccount.deposit('50', 'cash')).toEqual('Please enter a number!');
         expect(mohammad.bankAccount.deposit(15000, 'cash')).toEqual('Successfull, $15000 has been added to your cash account, the current cash balance is $15000');
 
@@ -57,7 +56,6 @@ describe('Bank', () => {
         expect(mohammad.bankAccount.withdraw('50', 'cash')).toEqual('Please enter a number!');
         expect(mohammad.bankAccount.withdraw(50, 'cash')).toEqual('Successfull, $50 has been subtracted from your cash account, the current cash balance is $14950');
         expect(mohammad.bankAccount.withdraw(50000, 'cash')).toEqual("You can't widraw $50000, your current cash balance is $14950");
-
 
         expect(mohammad.bankAccount.withdraw('50', 'credit')).toEqual('Please enter a number!');
         expect(mohammad.bankAccount.withdraw(50, 'credit')).toEqual('Successfull, $50 has been subtracted from your credit account, the current credit balance is $1950');
