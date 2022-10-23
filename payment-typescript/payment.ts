@@ -1,15 +1,39 @@
+interface UserObj {
+    userId: number,
+    name: string,
+    bankAccount: Bank,
+    userInfo(): string
+}
+
+interface ProductObj {
+    name: string,
+    price: number,
+    sale(percentage: number): string
+}
+
+interface BankObj {
+    accountId: number,
+    cashBalance: number,
+    creditBalance: number,
+    bankStatus(): string,
+    deposit(amount: number, accountType: string): string,
+    withdraw(amount: number, accountType: string): string
+    purchase(product: Product, accountType: string): string
+}
+
+
 /**
  * A class to create user objects which contains name and userId (which is a unique id).
  * @param {String} name The user's name.
  */
-export class User {
+export class User implements UserObj {
     static id: number = 1
-    userId: string
+    userId: number
     name: string
     bankAccount: Bank
 
     constructor(name: string) {
-        this.userId = User.id.toString()
+        this.userId = User.id
         this.name = name
         this.bankAccount = new Bank(0, 0)
         User.id++
@@ -19,7 +43,7 @@ export class User {
      * A method to inqure about the user's informations.
      * @returns {String} A message of the User's information (the name and id).
      */
-    get userInfo(): string {
+    userInfo(): string {
         return ` ${this.name} is the owner of the account with the id ${this.userId}`
     }
 }
@@ -30,7 +54,7 @@ export class User {
  * @param {String} name The name of the product.
  * @param {Number} price The price of the product.
  */
-export class Product {
+export class Product implements ProductObj {
     name: string
     price: number
 
@@ -45,8 +69,6 @@ export class Product {
      * @returns {String} The new price of the product.
      */
     sale(percentage: number): string {
-        if (typeof percentage != 'number') return 'Please enter a number!'
-
         if (percentage <= 1 && percentage >= 0) {
             this.price = this.price - this.price * percentage
             return `The new price of ${this.name} is $${this.price}`
@@ -61,14 +83,14 @@ export class Product {
  * @param {Number} cashBalance The intial cash balance of the bank account.
  * @param {Number} creditBalance The intial credit balance of the bank account.
  */
-export class Bank {
+export class Bank implements BankObj {
     static id = 1
-    accountId: string
+    accountId: number
     cashBalance: number
     creditBalance: number
 
     constructor(cashBalance: number, creditBalance: number) {
-        this.accountId = Bank.id.toString()
+        this.accountId = Bank.id
         this.cashBalance = cashBalance
         this.creditBalance = creditBalance
         Bank.id++
@@ -89,9 +111,6 @@ export class Bank {
      * @returns {String} A message of the added amount and the new balance of the bank account
      */
     deposit(amount: number, accountType: string): string {
-        if (typeof (amount) != 'number') return 'Please enter a number!'
-        if (accountType == null) return 'Please enter the type of the account ("cash" or "credit")'
-
         if (accountType.toLowerCase() == 'cash') {
             this.cashBalance += amount
             return `Successfull, $${amount} has been added to your cash account, the current cash balance is $${this.cashBalance}`
@@ -110,9 +129,6 @@ export class Bank {
      * @returns {String} A message of the subtracted amount and the new balance of the bank account
      */
     withdraw(amount: number, accountType: string): string {
-        if (typeof (amount) != 'number') return 'Please enter a number!'
-        if (accountType == null) return 'Please enter the type of the account ("cash" or "credit")'
-
         if (accountType.toLowerCase() == 'cash') {
             if (this.cashBalance >= amount) {
                 this.cashBalance -= amount
@@ -137,9 +153,6 @@ export class Bank {
      * @returns {string} A message of the product's name and price and the new balance of the bank account.
      */
     purchase(product: Product, accountType: string): string {
-        if (accountType === null) return 'Please enter the type of the account ("cash" or "credit")'
-        if (!(product instanceof Product)) return "Product not found, Please enter the product's object!"
-
         if (accountType.toLowerCase() == 'cash') {
             if (this.cashBalance >= product.price) {
                 this.cashBalance = this.cashBalance - product.price
@@ -154,6 +167,6 @@ export class Bank {
             }
             else return `The credit balance is $${this.creditBalance}, which is not sufficient to purchase ${product.name}, its price is $${product.price}`
         }
-        else return 'Please enter the type of the account ("cash" or "credit")'
+        else return 'Please enter the correct type of the account ("cash" or "credit")'
     }
 }
