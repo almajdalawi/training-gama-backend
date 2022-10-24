@@ -1,0 +1,12 @@
+/dist/**
+/coverage/**
+/node_modules/**
+*.eslintrc
+*.eslintignore
+*.config.js
+*.json
+*.md
+*.lock
+*.vscode
+*.log
+*.d.js
