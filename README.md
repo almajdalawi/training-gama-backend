@@ -8,9 +8,20 @@
 
 This repo is for practicing backend skills
 
+<br>
+
 ## Content
 
-- [Payment OOP](payment-OOP/README.md)
-- []()
+### JavaScript
+
+- [Payment OOP](JS/payment-OOP/README.md)
+-
+
+### Typescript
+
+- [Payment OOP TS](TS/payment-typescript/README.md)
+- [Node.js Server](TS/server nodeJs/README.md)
+
+<br>
 
 [GitHub](https://github.com/almajdalawi/training-gama-be)
