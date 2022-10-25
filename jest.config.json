@@ -2,11 +2,13 @@
   "moduleFileExtensions": [
     "js",
     "jsx",
-    "json"
+    "json",
+    "ts",
+    "tsx"
   ],
   "transform": {
     ".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub",
-    "^.+\\.(js|jsx)?$": "babel-jest"
+    "^.+\\.(js|jsx|ts|tsx)?$": "babel-jest"
   },
   "moduleNameMapper": {
     "^@/(.*)$": "<rootDir>/*/$1"
