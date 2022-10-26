@@ -1,12 +1,131 @@
-import { server, port, data } from './server'
 
-server.listen(port, (err) => {
-    if (err) {
-        console.log('Something went wrong', err)
-    } else {
-        console.log(`Listening to port ${port}`)
-        data.push('Hello World')
-        console.log(data)
+import * as http from 'http'
+import { Product } from '../payment-typescript/payment'
+
+interface ProductObj {
+    title: string,
+    price: number
+}
+
+interface BankObj {
+    accountId: number,
+    cashBalance: number,
+    creditBalance: number,
+}
+
+
+const productsData = {
+    'products': [
+        {
+            title: 'Car',
+            price: 8000
+        },
+        {
+            title: 'Bike',
+            price: 100
+        }
+    ]
+}
+
+let usersData = {
+    'users': [
+        {
+            "userId": 1,
+            "name": 'Emad',
+            "bankAccount": {
+                "accountId": 1,
+                "cashBalance": 1000,
+                "creditBalance": 1000,
+            },
+        },
+        {
+            "userId": 2,
+            "name": 'Mohammad',
+            "bankAccount": {
+                "accountId": 2,
+                "cashBalance": 2000,
+                "creditBalance": 2000,
+            }
+        }
+    ]
+}
+
+
+let counter = 0
+
+
+export const handleRequest = (req: http.IncomingMessage, res: http.ServerResponse) => {
+    const url: string | undefined = req.url
+    const method: string | undefined = req.method
+    const headers: http.IncomingHttpHeaders = req.headers
+
+    if (url === '/' && method === 'GET') {
+        counter++
+        homeHandler(req, res)
     }
-})
+    else if (url === '/allProducts' && method === 'GET') {
+        counter++
+        getProductsHandler(req, res)
+    }
+    // else if (url === '/addProduct' && method === 'POST') {
+    //     counter++
+    //     addProductHandler(req, res)
+    // } 
+    // else if (url === '/deleteProduct' && method === 'DELETE') {
+    //     counter++
+    //     deleteProductHandler(req, res)
+    // } 
+    // else if (url === '/updateProduct' && method === 'PUT') {
+    //     counter++
+    //     updateProductHandler(req, res)
+    // }
+    else {
+        counter++
+        notFoundHandler(req, res)
+    }
+}
 
+function homeHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    res.setHeader('Content-Type', 'application/json')
+    res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Welcome to my server' }))
+    return res.end()
+}
+
+function getProductsHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    res.setHeader('Content-Type', 'application/json')
+    res.write(JSON.stringify({ 'visit counter': counter, 'products': productsData }))
+    return res.end()
+}
+
+// function addProductHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+// console.log(req)
+//     let newProduct = new Product(req.body.title, req.body.price)
+//     productsData.products.push(newProduct)
+//     res.setHeader('Content-Type', 'application/json')
+//     res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product added successfully' }))
+// }
+
+// function deleteProductHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+//     res.setHeader('Content-Type', 'application/json')
+//     productsData.products = productsData.products.filter((product: ProductObj) => product.title !== req.body.title)
+//     res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product deleted successfully' }))
+//     return res.end()
+// }
+
+// function updateProductHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+//     res.setHeader('Content-Type', 'application/json')
+//     productsData.products = productsData.products.map((product: ProductObj) => {
+//         if (product.title === req.body.title) {
+//             product.price = req.body.price
+//         }
+//         return product
+//     })
+//     res.write(JSON.stringify({ 'visit counter': counter, 'message': "Product's price updated successfully" }))
+//     return res.end()
+// }
+
+function notFoundHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    res.setHeader('Content-Type', 'application/json')
+    res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Not Found' }))
+    return res.end()
+}
