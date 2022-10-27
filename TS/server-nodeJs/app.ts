@@ -1,5 +1,6 @@
 
 import * as http from 'http'
+import { json } from 'stream/consumers'
 import { Product } from '../payment-typescript/payment'
 
 interface ProductObj {
@@ -67,10 +68,10 @@ export const handleRequest = (req: http.IncomingMessage, res: http.ServerRespons
         counter++
         getProductsHandler(req, res)
     }
-    // else if (url === '/addProduct' && method === 'POST') {
-    //     counter++
-    //     addProductHandler(req, res)
-    // } 
+    else if (url === '/addProduct' && method === 'POST') {
+        counter++
+        addProductHandler(req, res)
+    }
     // else if (url === '/deleteProduct' && method === 'DELETE') {
     //     counter++
     //     deleteProductHandler(req, res)
@@ -97,13 +98,26 @@ function getProductsHandler(req: http.IncomingMessage, res: http.ServerResponse)
     return res.end()
 }
 
-// function addProductHandler(req: http.IncomingMessage, res: http.ServerResponse) {
-// console.log(req)
-//     let newProduct = new Product(req.body.title, req.body.price)
-//     productsData.products.push(newProduct)
-//     res.setHeader('Content-Type', 'application/json')
-//     res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product added successfully' }))
-// }
+function addProductHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    let body: any = [];
+    req.on('error', (err) => {
+        console.error(err);
+    }).on('data', (chunk) => {
+        body.push(chunk);
+    }).on('end', () => {
+        body = Buffer.concat(body).toString();
+
+        res.on('error', (err) => {
+            console.error(err);
+        });
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+
+        productsData.products.push(body)
+        res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product added successfully', 'products': productsData }))
+
+        res.end()
+    });
+}
 
 // function deleteProductHandler(req: http.IncomingMessage, res: http.ServerResponse) {
 //     res.setHeader('Content-Type', 'application/json')
