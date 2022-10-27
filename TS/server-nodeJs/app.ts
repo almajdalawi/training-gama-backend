@@ -72,14 +72,14 @@ export const handleRequest = (req: http.IncomingMessage, res: http.ServerRespons
         counter++
         addProductHandler(req, res)
     }
-    // else if (url === '/deleteProduct' && method === 'DELETE') {
-    //     counter++
-    //     deleteProductHandler(req, res)
-    // } 
-    // else if (url === '/updateProduct' && method === 'PUT') {
-    //     counter++
-    //     updateProductHandler(req, res)
-    // }
+    else if (url === '/deleteProduct' && method === 'DELETE') {
+        counter++
+        deleteProductHandler(req, res)
+    }
+    else if (url === '/updateProduct' && method === 'PUT') {
+        counter++
+        updateProductHandler(req, res)
+    }
     else {
         counter++
         notFoundHandler(req, res)
@@ -119,24 +119,59 @@ function addProductHandler(req: http.IncomingMessage, res: http.ServerResponse) 
     });
 }
 
-// function deleteProductHandler(req: http.IncomingMessage, res: http.ServerResponse) {
-//     res.setHeader('Content-Type', 'application/json')
-//     productsData.products = productsData.products.filter((product: ProductObj) => product.title !== req.body.title)
-//     res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product deleted successfully' }))
-//     return res.end()
-// }
+function deleteProductHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    let body: any = [];
+    req.on('error', (err) => {
+        console.error(err);
+    }).on('data', (chunk) => {
+        body.push(chunk);
+    }).on('end', () => {
+        body = Buffer.concat(body).toString();
 
-// function updateProductHandler(req: http.IncomingMessage, res: http.ServerResponse) {
-//     res.setHeader('Content-Type', 'application/json')
-//     productsData.products = productsData.products.map((product: ProductObj) => {
-//         if (product.title === req.body.title) {
-//             product.price = req.body.price
-//         }
-//         return product
-//     })
-//     res.write(JSON.stringify({ 'visit counter': counter, 'message': "Product's price updated successfully" }))
-//     return res.end()
-// }
+        res.on('error', (err) => {
+            console.error(err);
+        });
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+
+        for (let i = 0; i < productsData.products.length; i++) {
+            if (productsData.products[i].title == body) {
+                delete productsData.products[i]
+            }
+        }
+
+        res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product removed successfully', 'products': productsData }))
+
+        res.end()
+    });
+}
+
+function updateProductHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    let body: any = [];
+    req.on('error', (err) => {
+        console.error(err);
+    }).on('data', (chunk) => {
+        body.push(chunk);
+    }).on('end', () => {
+        body = Buffer.concat(body).toString();
+
+        res.on('error', (err) => {
+            console.error(err);
+        });
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+
+        let JSONBody = JSON.parse(body)
+        for (let i = 0; i < productsData.products.length; i++) {
+            console.log(productsData.products[i].title, JSONBody.title, productsData.products[i].title == JSONBody.title)
+            if (productsData.products[i].title == JSONBody.title) {
+                productsData.products[i].price = JSONBody.price
+            }
+        }
+
+        res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product removed successfully', 'products': productsData }))
+
+        res.end()
+    });
+}
 
 function notFoundHandler(req: http.IncomingMessage, res: http.ServerResponse) {
     res.setHeader('Content-Type', 'application/json')
