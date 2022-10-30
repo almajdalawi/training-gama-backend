@@ -398,9 +398,23 @@ function withdrawHandler(req: http.IncomingMessage, res: http.ServerResponse) {
         for (let i = 0; i < usersData.users.length; i++) {
             if (usersData.users[i].name == body.name) {
                 if (body.type == 'cash') {
-                    usersData.users[i].bankAccount.cashBalance -= body.amount
+                    if (usersData.users[i].bankAccount.cashBalance >= body.amount) {
+                        usersData.users[i].bankAccount.cashBalance -= body.amount
+                    }
+                    else {
+                        res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Not suficient money!' }))
+                        res.end()
+                        break
+                    }
                 } else if (body.type == 'credit') {
-                    usersData.users[i].bankAccount.creditBalance -= body.amount
+                    if (usersData.users[i].bankAccount.creditBalance >= body.amount) {
+                        usersData.users[i].bankAccount.creditBalance -= body.amount
+                    }
+                    else {
+                        res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Not suficient money!' }))
+                        res.end()
+                        break
+                    }
                 }
                 flag = true
                 res.write(JSON.stringify({ 'visit counter': counter, 'bankDetails': usersData.users[i].bankAccount }))
@@ -455,9 +469,23 @@ function purchaseHandler(req: http.IncomingMessage, res: http.ServerResponse) {
         for (let i = 0; i < usersData.users.length; i++) {
             if (usersData.users[i].name == body.username) {
                 if (body.type == 'cash') {
-                    usersData.users[i].bankAccount.cashBalance -= theProduct.price
+                    if (usersData.users[i].bankAccount.cashBalance >= theProduct.price) {
+                        usersData.users[i].bankAccount.cashBalance -= theProduct.price
+                    }
+                    else {
+                        res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Not suficient money!' }))
+                        res.end()
+                        break
+                    }
                 } else if (body.type == 'credit') {
-                    usersData.users[i].bankAccount.creditBalance -= theProduct.price
+                    if (usersData.users[i].bankAccount.creditBalance >= theProduct.price) {
+                        usersData.users[i].bankAccount.creditBalance -= theProduct.price
+                    }
+                    else {
+                        res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Not suficient money!' }))
+                        res.end()
+                        break
+                    }
                 }
                 flag2 = true
                 res.write(JSON.stringify({ 'visit counter': counter, "message": `Payment succeded, you purchased a ${theProduct.price}`, 'bankDetails': usersData.users[i].bankAccount }))
