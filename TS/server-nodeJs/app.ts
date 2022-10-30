@@ -1,64 +1,16 @@
-
 import * as http from 'http'
-import { Product, User, Bank } from '../payment-typescript/payment'
-
-interface ProductObj {
-    name: string,
-    price: number
-}
-
-interface BankObj {
-    accountId: number,
-    cashBalance: number,
-    creditBalance: number
-}
-
-interface UserObj {
-    userId: number,
-    name: string,
-    bankAccount: BankObj
-}
-
-
-const productsData = {
-    products: [
-        {
-            name: 'Car',
-            price: 8000
-        },
-        {
-            name: 'Bike',
-            price: 100
-        }
-    ]
-}
-
-let usersData = {
-    users: [
-        {
-            userId: 1,
-            name: 'Emad',
-            bankAccount: {
-                accountId: 1,
-                cashBalance: 1000,
-                creditBalance: 1000,
-            },
-        },
-        {
-            userId: 2,
-            name: 'Mohammad',
-            bankAccount: {
-                accountId: 2,
-                cashBalance: 2000,
-                creditBalance: 2000,
-            }
-        }
-    ]
-}
-
+import { Product, User } from '../payment-typescript/payment'
+import { ProductObj, BankObj, UserObj } from './interfaces/app-interfaces'
+import * as data from './static/data.json'
 
 let counter = 0
 
+// enum Methods {
+//     GET,
+//     POST,
+//     DELETE,
+//     PATCH
+// }
 
 export const handleRequest = (req: http.IncomingMessage, res: http.ServerResponse) => {
     const url: string | undefined = req.url
@@ -71,7 +23,7 @@ export const handleRequest = (req: http.IncomingMessage, res: http.ServerRespons
             'GET': () => getProductsHandler(req, res),
             'POST': () => addProductHandler(req, res),
             'DELETE': () => deleteProductHandler(req, res),
-            'PUT': () => updateProductHandler(req, res),
+            'PATCH': () => updateProductHandler(req, res),
         },
         '/user': {
             'GET': () => getUsersHandler(req, res),
@@ -105,7 +57,7 @@ function getProductsHandler(req: http.IncomingMessage, res: http.ServerResponse)
     counter++
 
     res.setHeader('Content-Type', 'application/json')
-    res.write(JSON.stringify({ 'visit counter': counter, 'products': productsData }))
+    res.write(JSON.stringify({ 'visit counter': counter, 'products': data.products }))
     res.end()
 }
 
@@ -132,8 +84,8 @@ function addProductHandler(req: http.IncomingMessage, res: http.ServerResponse) 
 
         let newProduct: ProductObj = new Product(body.name, body.price)
 
-        productsData.products.push(newProduct)
-        res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product added successfully', 'products': productsData }))
+        data.products.push(newProduct)
+        res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product added successfully', 'products': data.products }))
 
         res.end()
     });
@@ -158,16 +110,16 @@ function deleteProductHandler(req: http.IncomingMessage, res: http.ServerRespons
         res.writeHead(200, { 'Content-Type': 'application/json' })
 
         let flag = false
-        for (let i = 0; i < productsData.products.length; i++) {
-            if (productsData.products[i].name == body) {
-                delete productsData.products[i]
+        for (let i = 0; i < data.products.length; i++) {
+            if (data.products[i].name == body) {
+                delete data.products[i]
                 flag = true
                 break
             }
         }
 
         if (flag) {
-            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product removed successfully', 'products': productsData }))
+            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product removed successfully', 'products': data.products }))
         } else {
             res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product Not found!' }))
         }
@@ -196,15 +148,15 @@ function updateProductHandler(req: http.IncomingMessage, res: http.ServerRespons
 
         let flag = false
         let JSONBody = JSON.parse(body)
-        for (let i = 0; i < productsData.products.length; i++) {
-            if (productsData.products[i].name == JSONBody.name) {
-                productsData.products[i].price = JSONBody.price
+        for (let i = 0; i < data.products.length; i++) {
+            if (data.products[i].name == JSONBody.name) {
+                data.products[i].price = JSONBody.price
                 flag = true
                 break
             }
         }
         if (flag) {
-            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product updated successfully', 'products': productsData }))
+            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product updated successfully', 'products': data.products }))
         } else {
             res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product Not found!' }))
         }
@@ -221,7 +173,7 @@ function getUsersHandler(req: http.IncomingMessage, res: http.ServerResponse) {
     counter++
 
     res.setHeader('Content-Type', 'application/json')
-    res.write(JSON.stringify({ 'visit counter': counter, 'products': usersData }))
+    res.write(JSON.stringify({ 'visit counter': counter, 'products': data.users }))
     res.end()
 }
 
@@ -247,8 +199,8 @@ function addUserHandler(req: http.IncomingMessage, res: http.ServerResponse) {
 
         let newUser: UserObj = new User(body.name)
 
-        usersData.users.push(newUser)
-        res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product added successfully', 'products': usersData }))
+        data.users.push(newUser)
+        res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product added successfully', 'products': data.users }))
 
         res.end()
     });
@@ -273,16 +225,16 @@ function deleteUserHandler(req: http.IncomingMessage, res: http.ServerResponse) 
         res.writeHead(200, { 'Content-Type': 'application/json' })
 
         let flag = false
-        for (let i = 0; i < usersData.users.length; i++) {
-            if (usersData.users[i].name == body) {
-                delete usersData.users[i]
+        for (let i = 0; i < data.users.length; i++) {
+            if (data.users[i].name == body) {
+                delete data.users[i]
                 flag = true
                 break
             }
         }
 
         if (flag) {
-            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product removed successfully', 'products': usersData }))
+            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product removed successfully', 'products': data.users }))
         } else {
             res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product Not found!' }))
         }
@@ -314,9 +266,9 @@ function bankDetailsHandler(req: http.IncomingMessage, res: http.ServerResponse)
 
         let bankDetails: BankObj
         let flag = false
-        for (let i = 0; i < usersData.users.length; i++) {
-            if (usersData.users[i].name == body) {
-                bankDetails = usersData.users[i].bankAccount
+        for (let i = 0; i < data.users.length; i++) {
+            if (data.users[i].name == body) {
+                bankDetails = data.users[i].bankAccount
                 flag = true
                 res.write(JSON.stringify({ 'visit counter': counter, 'bankDetails': bankDetails }))
                 break
@@ -352,15 +304,15 @@ function depositHandler(req: http.IncomingMessage, res: http.ServerResponse) {
         body = JSON.parse(body)
 
         let flag = false
-        for (let i = 0; i < usersData.users.length; i++) {
-            if (usersData.users[i].name == body.name) {
+        for (let i = 0; i < data.users.length; i++) {
+            if (data.users[i].name == body.name) {
                 if (body.type == 'cash') {
-                    usersData.users[i].bankAccount.cashBalance += body.amount
+                    data.users[i].bankAccount.cashBalance += body.amount
                 } else if (body.type == 'credit') {
-                    usersData.users[i].bankAccount.creditBalance += body.amount
+                    data.users[i].bankAccount.creditBalance += body.amount
                 }
                 flag = true
-                res.write(JSON.stringify({ 'visit counter': counter, 'bankDetails': usersData.users[i].bankAccount }))
+                res.write(JSON.stringify({ 'visit counter': counter, 'bankDetails': data.users[i].bankAccount }))
                 break
             }
         }
@@ -395,29 +347,29 @@ function withdrawHandler(req: http.IncomingMessage, res: http.ServerResponse) {
         body = JSON.parse(body)
 
         let flag = false
-        for (let i = 0; i < usersData.users.length; i++) {
-            if (usersData.users[i].name == body.name) {
+        for (let i = 0; i < data.users.length; i++) {
+            if (data.users[i].name == body.name) {
                 if (body.type == 'cash') {
-                    if (usersData.users[i].bankAccount.cashBalance >= body.amount) {
-                        usersData.users[i].bankAccount.cashBalance -= body.amount
+                    if (data.users[i].bankAccount.cashBalance >= body.amount) {
+                        data.users[i].bankAccount.cashBalance -= body.amount
                     }
                     else {
                         res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Not suficient money!' }))
                         res.end()
-                        break
+                        return
                     }
                 } else if (body.type == 'credit') {
-                    if (usersData.users[i].bankAccount.creditBalance >= body.amount) {
-                        usersData.users[i].bankAccount.creditBalance -= body.amount
+                    if (data.users[i].bankAccount.creditBalance >= body.amount) {
+                        data.users[i].bankAccount.creditBalance -= body.amount
                     }
                     else {
                         res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Not suficient money!' }))
                         res.end()
-                        break
+                        return
                     }
                 }
                 flag = true
-                res.write(JSON.stringify({ 'visit counter': counter, 'bankDetails': usersData.users[i].bankAccount }))
+                res.write(JSON.stringify({ 'visit counter': counter, 'bankDetails': data.users[i].bankAccount }))
                 break
             }
         }
@@ -452,9 +404,9 @@ function purchaseHandler(req: http.IncomingMessage, res: http.ServerResponse) {
 
         let theProduct: ProductObj = { name: '', price: 0 }
         let flag = false
-        for (let i = 0; i < productsData.products.length; i++) {
-            if (productsData.products[i].name == body.productName) {
-                theProduct = productsData.products[i]
+        for (let i = 0; i < data.products.length; i++) {
+            if (data.products[i].name == body.productName) {
+                theProduct = data.products[i]
                 flag = true
                 break
             }
@@ -466,29 +418,29 @@ function purchaseHandler(req: http.IncomingMessage, res: http.ServerResponse) {
         }
 
         let flag2 = false
-        for (let i = 0; i < usersData.users.length; i++) {
-            if (usersData.users[i].name == body.username) {
+        for (let i = 0; i < data.users.length; i++) {
+            if (data.users[i].name == body.username) {
                 if (body.type == 'cash') {
-                    if (usersData.users[i].bankAccount.cashBalance >= theProduct.price) {
-                        usersData.users[i].bankAccount.cashBalance -= theProduct.price
+                    if (data.users[i].bankAccount.cashBalance >= theProduct.price) {
+                        data.users[i].bankAccount.cashBalance -= theProduct.price
                     }
                     else {
                         res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Not suficient money!' }))
                         res.end()
-                        break
+                        return
                     }
                 } else if (body.type == 'credit') {
-                    if (usersData.users[i].bankAccount.creditBalance >= theProduct.price) {
-                        usersData.users[i].bankAccount.creditBalance -= theProduct.price
+                    if (data.users[i].bankAccount.creditBalance >= theProduct.price) {
+                        data.users[i].bankAccount.creditBalance -= theProduct.price
                     }
                     else {
                         res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Not suficient money!' }))
                         res.end()
-                        break
+                        return
                     }
                 }
                 flag2 = true
-                res.write(JSON.stringify({ 'visit counter': counter, "message": `Payment succeded, you purchased a ${theProduct.price}`, 'bankDetails': usersData.users[i].bankAccount }))
+                res.write(JSON.stringify({ 'visit counter': counter, "message": `Payment succeded, you purchased a ${theProduct.price}`, 'bankDetails': data.users[i].bankAccount }))
                 break
             }
         }

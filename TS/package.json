@@ -4,7 +4,7 @@
   "description": "**Author:**  [Emad Almajdalawi](https://github.com/almajdalawi)",
   "main": "index.js",
   "scripts": {
-    "build": "tsc --outDir build",
+    "build": "tsc --resolveJsonModule --outDir build",
     "test": "jest --verbose --coverage",
     "lint": "tsc --noEmit --incremental && eslint . --ext .ts,.tsx,.js,.jsx",
     "lint-and-fix": "yarn lint --fix"
@@ -19,7 +19,9 @@
     "url": "https://github.com/almajdalawi/training-gama-backend/issues"
   },
   "homepage": "https://github.com/almajdalawi/training-gama-backend#readme/TS",
-  "dependencies": {},
+  "dependencies": {
+    "dotenv": "^16.0.3"
+  },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.19.6",
     "@babel/preset-env": "^7.19.4",
