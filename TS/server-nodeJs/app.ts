@@ -1,28 +1,21 @@
 
 import * as http from 'http'
-import { json } from 'stream/consumers'
 import { Product } from '../payment-typescript/payment'
 
 interface ProductObj {
-    title: string,
+    name: string,
     price: number
-}
-
-interface BankObj {
-    accountId: number,
-    cashBalance: number,
-    creditBalance: number,
 }
 
 
 const productsData = {
     'products': [
         {
-            title: 'Car',
+            name: 'Car',
             price: 8000
         },
         {
-            title: 'Bike',
+            name: 'Bike',
             price: 100
         }
     ]
@@ -60,48 +53,44 @@ export const handleRequest = (req: http.IncomingMessage, res: http.ServerRespons
     const method: string | undefined = req.method
     const headers: http.IncomingHttpHeaders = req.headers
 
-    if (url === '/' && method === 'GET') {
-        counter++
-        homeHandler(req, res)
+    let routes: any = {
+        '/': { 'GET': () => homeHandler(req, res) },
+        '/products': {
+            'GET': () => getProductsHandler(req, res),
+            'POST': () => addProductHandler(req, res),
+            'DELETE': () => deleteProductHandler(req, res),
+            'PUT': () => updateProductHandler(req, res),
+        }
     }
-    else if (url === '/allProducts' && method === 'GET') {
-        counter++
-        getProductsHandler(req, res)
-    }
-    else if (url === '/addProduct' && method === 'POST') {
-        counter++
-        addProductHandler(req, res)
-    }
-    else if (url === '/deleteProduct' && method === 'DELETE') {
-        counter++
-        deleteProductHandler(req, res)
-    }
-    else if (url === '/updateProduct' && method === 'PUT') {
-        counter++
-        updateProductHandler(req, res)
-    }
-    else {
-        counter++
-        notFoundHandler(req, res)
-    }
+
+    url && method && routes[url] ? routes[url][method]() : notFoundHandler(req, res)
 }
 
+
 function homeHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    counter++
+
     res.setHeader('Content-Type', 'application/json')
     res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Welcome to my server' }))
     return res.end()
 }
 
 function getProductsHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    counter++
+
     res.setHeader('Content-Type', 'application/json')
     res.write(JSON.stringify({ 'visit counter': counter, 'products': productsData }))
     return res.end()
 }
 
 function addProductHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    counter++
+
     let body: any = [];
     req.on('error', (err) => {
         console.error(err);
+        res.statusCode = 400;
+        res.end();
     }).on('data', (chunk) => {
         body.push(chunk);
     }).on('end', () => {
@@ -112,7 +101,13 @@ function addProductHandler(req: http.IncomingMessage, res: http.ServerResponse) 
         });
         res.writeHead(200, { 'Content-Type': 'application/json' })
 
-        productsData.products.push(body)
+        body = JSON.parse(body)
+        console.log(body, typeof body)
+
+
+        let newProduct: ProductObj = new Product(body.name, body.price)
+
+        productsData.products.push(newProduct)
         res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product added successfully', 'products': productsData }))
 
         res.end()
@@ -120,9 +115,13 @@ function addProductHandler(req: http.IncomingMessage, res: http.ServerResponse) 
 }
 
 function deleteProductHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    counter++
+
     let body: any = [];
     req.on('error', (err) => {
         console.error(err);
+        res.statusCode = 400;
+        res.end();
     }).on('data', (chunk) => {
         body.push(chunk);
     }).on('end', () => {
@@ -134,7 +133,7 @@ function deleteProductHandler(req: http.IncomingMessage, res: http.ServerRespons
         res.writeHead(200, { 'Content-Type': 'application/json' })
 
         for (let i = 0; i < productsData.products.length; i++) {
-            if (productsData.products[i].title == body) {
+            if (productsData.products[i].name == body) {
                 delete productsData.products[i]
             }
         }
@@ -146,9 +145,13 @@ function deleteProductHandler(req: http.IncomingMessage, res: http.ServerRespons
 }
 
 function updateProductHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    counter++
+
     let body: any = [];
     req.on('error', (err) => {
         console.error(err);
+        res.statusCode = 400;
+        res.end();
     }).on('data', (chunk) => {
         body.push(chunk);
     }).on('end', () => {
@@ -161,8 +164,7 @@ function updateProductHandler(req: http.IncomingMessage, res: http.ServerRespons
 
         let JSONBody = JSON.parse(body)
         for (let i = 0; i < productsData.products.length; i++) {
-            console.log(productsData.products[i].title, JSONBody.title, productsData.products[i].title == JSONBody.title)
-            if (productsData.products[i].title == JSONBody.title) {
+            if (productsData.products[i].name == JSONBody.name) {
                 productsData.products[i].price = JSONBody.price
             }
         }
@@ -174,7 +176,7 @@ function updateProductHandler(req: http.IncomingMessage, res: http.ServerRespons
 }
 
 function notFoundHandler(req: http.IncomingMessage, res: http.ServerResponse) {
-    res.setHeader('Content-Type', 'application/json')
+    res.writeHead(404, { 'Content-Type': 'application/json' })
     res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Not Found' }))
     return res.end()
 }
