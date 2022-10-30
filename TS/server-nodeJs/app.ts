@@ -354,7 +354,7 @@ function depositHandler(req: http.IncomingMessage, res: http.ServerResponse) {
         let flag = false
         for (let i = 0; i < usersData.users.length; i++) {
             if (usersData.users[i].name == body.name) {
-                if (body.type == 'chash') {
+                if (body.type == 'cash') {
                     usersData.users[i].bankAccount.cashBalance += body.amount
                 } else if (body.type == 'credit') {
                     usersData.users[i].bankAccount.creditBalance += body.amount
@@ -397,7 +397,7 @@ function withdrawHandler(req: http.IncomingMessage, res: http.ServerResponse) {
         let flag = false
         for (let i = 0; i < usersData.users.length; i++) {
             if (usersData.users[i].name == body.name) {
-                if (body.type == 'chash') {
+                if (body.type == 'cash') {
                     usersData.users[i].bankAccount.cashBalance -= body.amount
                 } else if (body.type == 'credit') {
                     usersData.users[i].bankAccount.creditBalance -= body.amount
@@ -454,13 +454,12 @@ function purchaseHandler(req: http.IncomingMessage, res: http.ServerResponse) {
         let flag2 = false
         for (let i = 0; i < usersData.users.length; i++) {
             if (usersData.users[i].name == body.username) {
-                if (body.type == 'chash') {
+                if (body.type == 'cash') {
                     usersData.users[i].bankAccount.cashBalance -= theProduct.price
                 } else if (body.type == 'credit') {
                     usersData.users[i].bankAccount.creditBalance -= theProduct.price
                 }
                 flag2 = true
-                console.log(theProduct.price, usersData.users[i].bankAccount.cashBalance)
                 res.write(JSON.stringify({ 'visit counter': counter, "message": `Payment succeded, you purchased a ${theProduct.price}`, 'bankDetails': usersData.users[i].bankAccount }))
                 break
             }
