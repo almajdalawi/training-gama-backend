@@ -1,6 +1,6 @@
 
 import * as http from 'http'
-import { Product, User } from '../payment-typescript/payment'
+import { Product, User, Bank } from '../payment-typescript/payment'
 
 interface ProductObj {
     name: string,
@@ -78,7 +78,10 @@ export const handleRequest = (req: http.IncomingMessage, res: http.ServerRespons
             'POST': () => addUserHandler(req, res),
             'DELETE': () => deleteUserHandler(req, res),
         },
-
+        '/bank': { 'POST': () => bankDetailsHandler(req, res) },
+        '/deposit': { 'POST': () => depositHandler(req, res) },
+        '/withdraw': { 'POST': () => withdrawHandler(req, res) },
+        '/purchase': { 'POST': () => purchaseHandler(req, res) }
     }
 
     url && method && routes[url] ? routes[url][method]() : notFoundHandler(req, res)
@@ -125,7 +128,6 @@ function addProductHandler(req: http.IncomingMessage, res: http.ServerResponse) 
         res.writeHead(200, { 'Content-Type': 'application/json' })
 
         body = JSON.parse(body)
-        console.log(body, typeof body)
 
 
         let newProduct: ProductObj = new Product(body.name, body.price)
@@ -156,11 +158,11 @@ function deleteProductHandler(req: http.IncomingMessage, res: http.ServerRespons
         res.writeHead(200, { 'Content-Type': 'application/json' })
 
         let flag = false
-        console.log(productsData.products)
         for (let i = 0; i < productsData.products.length; i++) {
             if (productsData.products[i].name == body) {
                 delete productsData.products[i]
                 flag = true
+                break
             }
         }
 
@@ -198,6 +200,7 @@ function updateProductHandler(req: http.IncomingMessage, res: http.ServerRespons
             if (productsData.products[i].name == JSONBody.name) {
                 productsData.products[i].price = JSONBody.price
                 flag = true
+                break
             }
         }
         if (flag) {
@@ -274,6 +277,7 @@ function deleteUserHandler(req: http.IncomingMessage, res: http.ServerResponse) 
             if (usersData.users[i].name == body) {
                 delete usersData.users[i]
                 flag = true
+                break
             }
         }
 
@@ -286,6 +290,191 @@ function deleteUserHandler(req: http.IncomingMessage, res: http.ServerResponse) 
         res.end()
     });
 }
+
+
+
+
+function bankDetailsHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    counter++
+
+    let body: any = [];
+    req.on('error', (err) => {
+        console.error(err);
+        res.statusCode = 400;
+        res.end();
+    }).on('data', (chunk) => {
+        body.push(chunk);
+    }).on('end', () => {
+        body = Buffer.concat(body).toString();
+
+        res.on('error', (err) => {
+            console.error(err);
+        });
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+
+        let bankDetails: BankObj
+        let flag = false
+        for (let i = 0; i < usersData.users.length; i++) {
+            if (usersData.users[i].name == body) {
+                bankDetails = usersData.users[i].bankAccount
+                flag = true
+                res.write(JSON.stringify({ 'visit counter': counter, 'bankDetails': bankDetails }))
+                break
+            }
+        }
+
+        if (!flag) {
+            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'User Not found!' }))
+        }
+
+        res.end()
+    });
+}
+
+function depositHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    counter++
+
+    let body: any = [];
+    req.on('error', (err) => {
+        console.error(err);
+        res.statusCode = 400;
+        res.end();
+    }).on('data', (chunk) => {
+        body.push(chunk);
+    }).on('end', () => {
+        body = Buffer.concat(body).toString();
+
+        res.on('error', (err) => {
+            console.error(err);
+        });
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+
+        body = JSON.parse(body)
+
+        let flag = false
+        for (let i = 0; i < usersData.users.length; i++) {
+            if (usersData.users[i].name == body.name) {
+                if (body.type == 'chash') {
+                    usersData.users[i].bankAccount.cashBalance += body.amount
+                } else if (body.type == 'credit') {
+                    usersData.users[i].bankAccount.creditBalance += body.amount
+                }
+                flag = true
+                res.write(JSON.stringify({ 'visit counter': counter, 'bankDetails': usersData.users[i].bankAccount }))
+                break
+            }
+        }
+
+        if (!flag) {
+            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'User Not found!' }))
+        }
+
+        res.end()
+    });
+}
+
+
+function withdrawHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    counter++
+
+    let body: any = [];
+    req.on('error', (err) => {
+        console.error(err);
+        res.statusCode = 400;
+        res.end();
+    }).on('data', (chunk) => {
+        body.push(chunk);
+    }).on('end', () => {
+        body = Buffer.concat(body).toString();
+
+        res.on('error', (err) => {
+            console.error(err);
+        });
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+
+        body = JSON.parse(body)
+
+        let flag = false
+        for (let i = 0; i < usersData.users.length; i++) {
+            if (usersData.users[i].name == body.name) {
+                if (body.type == 'chash') {
+                    usersData.users[i].bankAccount.cashBalance -= body.amount
+                } else if (body.type == 'credit') {
+                    usersData.users[i].bankAccount.creditBalance -= body.amount
+                }
+                flag = true
+                res.write(JSON.stringify({ 'visit counter': counter, 'bankDetails': usersData.users[i].bankAccount }))
+                break
+            }
+        }
+
+        if (!flag) {
+            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'User Not found!' }))
+        }
+
+        res.end()
+    });
+}
+
+function purchaseHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    counter++
+
+    let body: any = [];
+    req.on('error', (err) => {
+        console.error(err);
+        res.statusCode = 400;
+        res.end();
+    }).on('data', (chunk) => {
+        body.push(chunk);
+    }).on('end', () => {
+        body = Buffer.concat(body).toString();
+
+        res.on('error', (err) => {
+            console.error(err);
+        });
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+
+        body = JSON.parse(body)
+
+        let theProduct: ProductObj = { name: '', price: 0 }
+        let flag = false
+        for (let i = 0; i < productsData.products.length; i++) {
+            if (productsData.products[i].name == body.productName) {
+                theProduct = productsData.products[i]
+                flag = true
+                break
+            }
+        }
+
+        if (!flag) {
+            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product Not found!' }))
+            res.end()
+        }
+
+        let flag2 = false
+        for (let i = 0; i < usersData.users.length; i++) {
+            if (usersData.users[i].name == body.username) {
+                if (body.type == 'chash') {
+                    usersData.users[i].bankAccount.cashBalance -= theProduct.price
+                } else if (body.type == 'credit') {
+                    usersData.users[i].bankAccount.creditBalance -= theProduct.price
+                }
+                flag2 = true
+                console.log(theProduct.price, usersData.users[i].bankAccount.cashBalance)
+                res.write(JSON.stringify({ 'visit counter': counter, "message": `Payment succeded, you purchased a ${theProduct.price}`, 'bankDetails': usersData.users[i].bankAccount }))
+                break
+            }
+        }
+
+        if (!flag2) {
+            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'User Not found!' }))
+        }
+
+        res.end()
+    });
+}
+
+
 
 
 
