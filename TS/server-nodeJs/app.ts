@@ -1,15 +1,27 @@
 
 import * as http from 'http'
-import { Product } from '../payment-typescript/payment'
+import { Product, User } from '../payment-typescript/payment'
 
 interface ProductObj {
     name: string,
     price: number
 }
 
+interface BankObj {
+    accountId: number,
+    cashBalance: number,
+    creditBalance: number
+}
+
+interface UserObj {
+    userId: number,
+    name: string,
+    bankAccount: BankObj
+}
+
 
 const productsData = {
-    'products': [
+    products: [
         {
             name: 'Car',
             price: 8000
@@ -22,23 +34,23 @@ const productsData = {
 }
 
 let usersData = {
-    'users': [
+    users: [
         {
-            "userId": 1,
-            "name": 'Emad',
-            "bankAccount": {
-                "accountId": 1,
-                "cashBalance": 1000,
-                "creditBalance": 1000,
+            userId: 1,
+            name: 'Emad',
+            bankAccount: {
+                accountId: 1,
+                cashBalance: 1000,
+                creditBalance: 1000,
             },
         },
         {
-            "userId": 2,
-            "name": 'Mohammad',
-            "bankAccount": {
-                "accountId": 2,
-                "cashBalance": 2000,
-                "creditBalance": 2000,
+            userId: 2,
+            name: 'Mohammad',
+            bankAccount: {
+                accountId: 2,
+                cashBalance: 2000,
+                creditBalance: 2000,
             }
         }
     ]
@@ -60,11 +72,19 @@ export const handleRequest = (req: http.IncomingMessage, res: http.ServerRespons
             'POST': () => addProductHandler(req, res),
             'DELETE': () => deleteProductHandler(req, res),
             'PUT': () => updateProductHandler(req, res),
-        }
+        },
+        '/user': {
+            'GET': () => getUsersHandler(req, res),
+            'POST': () => addUserHandler(req, res),
+            'DELETE': () => deleteUserHandler(req, res),
+        },
+
     }
 
     url && method && routes[url] ? routes[url][method]() : notFoundHandler(req, res)
 }
+
+
 
 
 function homeHandler(req: http.IncomingMessage, res: http.ServerResponse) {
@@ -72,15 +92,18 @@ function homeHandler(req: http.IncomingMessage, res: http.ServerResponse) {
 
     res.setHeader('Content-Type', 'application/json')
     res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Welcome to my server' }))
-    return res.end()
+    res.end()
 }
+
+
+
 
 function getProductsHandler(req: http.IncomingMessage, res: http.ServerResponse) {
     counter++
 
     res.setHeader('Content-Type', 'application/json')
     res.write(JSON.stringify({ 'visit counter': counter, 'products': productsData }))
-    return res.end()
+    res.end()
 }
 
 function addProductHandler(req: http.IncomingMessage, res: http.ServerResponse) {
@@ -132,13 +155,20 @@ function deleteProductHandler(req: http.IncomingMessage, res: http.ServerRespons
         });
         res.writeHead(200, { 'Content-Type': 'application/json' })
 
+        let flag = false
+        console.log(productsData.products)
         for (let i = 0; i < productsData.products.length; i++) {
             if (productsData.products[i].name == body) {
                 delete productsData.products[i]
+                flag = true
             }
         }
 
-        res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product removed successfully', 'products': productsData }))
+        if (flag) {
+            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product removed successfully', 'products': productsData }))
+        } else {
+            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product Not found!' }))
+        }
 
         res.end()
     });
@@ -162,18 +192,103 @@ function updateProductHandler(req: http.IncomingMessage, res: http.ServerRespons
         });
         res.writeHead(200, { 'Content-Type': 'application/json' })
 
+        let flag = false
         let JSONBody = JSON.parse(body)
         for (let i = 0; i < productsData.products.length; i++) {
             if (productsData.products[i].name == JSONBody.name) {
                 productsData.products[i].price = JSONBody.price
+                flag = true
             }
         }
-
-        res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product removed successfully', 'products': productsData }))
+        if (flag) {
+            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product updated successfully', 'products': productsData }))
+        } else {
+            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product Not found!' }))
+        }
 
         res.end()
     });
 }
+
+
+
+
+
+function getUsersHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    counter++
+
+    res.setHeader('Content-Type', 'application/json')
+    res.write(JSON.stringify({ 'visit counter': counter, 'products': usersData }))
+    res.end()
+}
+
+function addUserHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    counter++
+
+    let body: any = [];
+    req.on('error', (err) => {
+        console.error(err);
+        res.statusCode = 400;
+        res.end();
+    }).on('data', (chunk) => {
+        body.push(chunk);
+    }).on('end', () => {
+        body = Buffer.concat(body).toString();
+
+        res.on('error', (err) => {
+            console.error(err);
+        });
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+
+        body = JSON.parse(body)
+
+        let newUser: UserObj = new User(body.name)
+
+        usersData.users.push(newUser)
+        res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product added successfully', 'products': usersData }))
+
+        res.end()
+    });
+}
+
+function deleteUserHandler(req: http.IncomingMessage, res: http.ServerResponse) {
+    counter++
+
+    let body: any = [];
+    req.on('error', (err) => {
+        console.error(err);
+        res.statusCode = 400;
+        res.end();
+    }).on('data', (chunk) => {
+        body.push(chunk);
+    }).on('end', () => {
+        body = Buffer.concat(body).toString();
+
+        res.on('error', (err) => {
+            console.error(err);
+        });
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+
+        let flag = false
+        for (let i = 0; i < usersData.users.length; i++) {
+            if (usersData.users[i].name == body) {
+                delete usersData.users[i]
+                flag = true
+            }
+        }
+
+        if (flag) {
+            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product removed successfully', 'products': usersData }))
+        } else {
+            res.write(JSON.stringify({ 'visit counter': counter, 'message': 'Product Not found!' }))
+        }
+
+        res.end()
+    });
+}
+
+
+
 
 function notFoundHandler(req: http.IncomingMessage, res: http.ServerResponse) {
     res.writeHead(404, { 'Content-Type': 'application/json' })
