@@ -3,7 +3,8 @@ import * as data from '../static/data.json'
 import { Product } from '../../payment-typescript/payment'
 import { IProduct } from '../interfaces/app-interfaces'
 import { BaseHandler } from './baseHandler'
-import { EreqReserrorEventListener } from '../utils/EreqReserrorEventListener'
+import { reqResErrorEventListener, reqError, resError } from '../utils/EreqReserrorEventListener'
+import { prepareBody } from '../utils/prepareBody'
 import { genericResponceMessage } from '../utils/responseSerializer'
 import { IResponce } from '../interfaces/app-interfaces'
 
@@ -18,7 +19,7 @@ export class ProductHandler extends BaseHandler {
     get(): void {
         global.counter++
 
-        EreqReserrorEventListener(this.req, this.res)
+        reqResErrorEventListener(this.req, this.res)
 
         let serialized: IResponce = genericResponceMessage(200, 'Successfull', global.counter, data.products)
 
@@ -32,29 +33,22 @@ export class ProductHandler extends BaseHandler {
 
         let body: any = [];
         this.req.on('error', (err) => {
-            console.error(err);
-            this.res.statusCode = 400;
-            this.res.end();
+            reqError(this.res, err)
         }).on('data', (chunk) => {
             body.push(chunk);
         }).on('end', () => {
-            body = Buffer.concat(body).toString();
-
             this.res.on('error', (err) => {
-                console.error(err);
+                resError(this.res, err)
             });
+
+            body = prepareBody(body)
             this.res.writeHead(200, { 'Content-Type': 'application/json' })
 
-            body = JSON.parse(body)
-
-
             let newProduct: IProduct = new Product(body.name, body.price)
-
             data.products.push(newProduct)
+
             let serialized: IResponce = genericResponceMessage(200, 'Product added successfully', global.counter, data.products)
-
             this.res.write(JSON.stringify(serialized))
-
             this.res.end()
         });
     }
@@ -64,22 +58,20 @@ export class ProductHandler extends BaseHandler {
 
         let body: any = [];
         this.req.on('error', (err) => {
-            console.error(err);
-            this.res.statusCode = 400;
-            this.res.end();
+            reqError(this.res, err)
         }).on('data', (chunk) => {
             body.push(chunk);
         }).on('end', () => {
-            body = Buffer.concat(body).toString();
-
             this.res.on('error', (err) => {
-                console.error(err);
+                resError(this.res, err)
             });
+
+            body = prepareBody(body)
             this.res.writeHead(200, { 'Content-Type': 'application/json' })
 
             let flag = false
             for (let i = 0; i < data.products.length; i++) {
-                if (data.products[i].name == body) {
+                if (data.products[i].name == body.name) {
                     delete data.products[i]
                     flag = true
                     break
@@ -103,24 +95,21 @@ export class ProductHandler extends BaseHandler {
 
         let body: any = [];
         this.req.on('error', (err) => {
-            console.error(err);
-            this.res.statusCode = 400;
-            this.res.end();
+            reqError(this.res, err)
         }).on('data', (chunk) => {
             body.push(chunk);
         }).on('end', () => {
-            body = Buffer.concat(body).toString();
-
             this.res.on('error', (err) => {
-                console.error(err);
+                resError(this.res, err)
             });
+
+            body = prepareBody(body)
             this.res.writeHead(200, { 'Content-Type': 'application/json' })
 
             let flag = false
-            let JSONBody = JSON.parse(body)
             for (let i = 0; i < data.products.length; i++) {
-                if (data.products[i].name == JSONBody.name) {
-                    data.products[i].price = JSONBody.price
+                if (data.products[i].name == body.name) {
+                    data.products[i].price = body.price
                     flag = true
                     break
                 }

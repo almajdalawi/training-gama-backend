@@ -1,5 +1,4 @@
 import * as http from 'http'
-import { BaseHandler } from './baseHandler'
 
 
 export class MyErrorHandler {
@@ -14,3 +13,22 @@ export class MyErrorHandler {
         return this.res.end()
     }
 }
+
+// export class LargFile extends Error {
+//     isLarg: boolean
+//     status: number
+//     constructor(message: string) {
+//         super(message)
+
+//         // assign the error class name in your custom error (as a shortcut)
+//         this.name = this.constructor.name
+
+//         // capturing the stack trace keeps the reference to your error class
+//         Error.captureStackTrace(this, this.constructor);
+
+
+//         this.status = 500
+
+//         this.isLarg = true
+//     }
+// }

@@ -1,6 +1,6 @@
 import * as http from 'http'
 import { BaseHandler } from './baseHandler'
-import { EreqReserrorEventListener } from '../utils/EreqReserrorEventListener'
+import { reqResErrorEventListener } from '../utils/EreqReserrorEventListener'
 import { genericResponceMessage } from '../utils/responseSerializer'
 import { IResponce } from '../interfaces/app-interfaces'
 
@@ -16,7 +16,7 @@ export class HomeHandler extends BaseHandler {
     get(): void {
         global.counter++
 
-        EreqReserrorEventListener(this.req, this.res)
+        reqResErrorEventListener(this.req, this.res)
 
         let serialized: IResponce = genericResponceMessage(200, 'Welcome to my server', global.counter, {})
 

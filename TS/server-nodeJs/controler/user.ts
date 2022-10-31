@@ -3,7 +3,8 @@ import * as data from '../static/data.json'
 import { BaseHandler } from './baseHandler'
 import { IBank, IUser } from '../interfaces/app-interfaces'
 import { User } from '../../payment-typescript/payment'
-import { EreqReserrorEventListener } from '../utils/EreqReserrorEventListener'
+import { reqResErrorEventListener, reqError, resError } from '../utils/EreqReserrorEventListener'
+import { prepareBody } from '../utils/prepareBody'
 import { genericResponceMessage } from '../utils/responseSerializer'
 import { IResponce } from '../interfaces/app-interfaces'
 
@@ -19,7 +20,7 @@ export class UserHandler extends BaseHandler {
     get(): void {
         global.counter++
 
-        EreqReserrorEventListener(this.req, this.res)
+        reqResErrorEventListener(this.req, this.res)
 
         let serialized: IResponce = genericResponceMessage(200, 'Successfull', global.counter, data.users)
 
@@ -34,29 +35,22 @@ export class UserHandler extends BaseHandler {
 
         let body: any = [];
         this.req.on('error', (err) => {
-            console.error(err);
-            this.res.statusCode = 400;
-            this.res.end();
+            reqError(this.res, err)
         }).on('data', (chunk) => {
             body.push(chunk);
         }).on('end', () => {
-            body = Buffer.concat(body).toString();
-
             this.res.on('error', (err) => {
-                console.error(err);
+                resError(this.res, err)
             });
+
+            body = prepareBody(body)
             this.res.writeHead(200, { 'Content-Type': 'application/json' })
 
-            body = JSON.parse(body)
-
             let newUser: IUser = new User(body.name)
-
             data.users.push(newUser)
 
             let serialized: IResponce = genericResponceMessage(200, 'User added successfully', global.counter, data.users)
-
             this.res.write(JSON.stringify(serialized))
-
             this.res.end()
         });
     }
@@ -66,22 +60,20 @@ export class UserHandler extends BaseHandler {
 
         let body: any = [];
         this.req.on('error', (err) => {
-            console.error(err);
-            this.res.statusCode = 400;
-            this.res.end();
+            reqError(this.res, err)
         }).on('data', (chunk) => {
             body.push(chunk);
         }).on('end', () => {
-            body = Buffer.concat(body).toString();
-
             this.res.on('error', (err) => {
-                console.error(err);
+                resError(this.res, err)
             });
+
+            body = prepareBody(body)
             this.res.writeHead(200, { 'Content-Type': 'application/json' })
 
             let flag = false
             for (let i = 0; i < data.users.length; i++) {
-                if (data.users[i].name == body) {
+                if (data.users[i].name == body.name) {
                     delete data.users[i]
                     flag = true
                     break
@@ -117,23 +109,21 @@ export class BankHandler extends BaseHandler {
 
         let body: any = [];
         this.req.on('error', (err) => {
-            console.error(err);
-            this.res.statusCode = 400;
-            this.res.end();
+            reqError(this.res, err)
         }).on('data', (chunk) => {
             body.push(chunk);
         }).on('end', () => {
-            body = Buffer.concat(body).toString();
-
             this.res.on('error', (err) => {
-                console.error(err);
+                resError(this.res, err)
             });
+
+            body = prepareBody(body)
             this.res.writeHead(200, { 'Content-Type': 'application/json' })
 
             let bankDetails: IBank
             let flag = false
             for (let i = 0; i < data.users.length; i++) {
-                if (data.users[i].name == body) {
+                if (data.users[i].name == body.name) {
                     bankDetails = data.users[i].bankAccount
                     flag = true
                     let serialized: IResponce = genericResponceMessage(200, 'Bank details fetched successfull', global.counter, bankDetails)

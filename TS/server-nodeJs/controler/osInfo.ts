@@ -1,7 +1,7 @@
 import * as http from 'http'
 import * as os from 'os'
 import { genericResponceMessage } from '../utils/responseSerializer'
-import { EreqReserrorEventListener } from '../utils/EreqReserrorEventListener'
+import { reqResErrorEventListener } from '../utils/EreqReserrorEventListener'
 import { BaseHandler } from './baseHandler'
 import { IOsInfo, IResponce } from '../interfaces/app-interfaces'
 
@@ -25,7 +25,7 @@ export class OsInfoHandler extends BaseHandler {
             uptime: os.uptime(),
         }
 
-        EreqReserrorEventListener(this.req, this.res)
+        reqResErrorEventListener(this.req, this.res)
 
         let serialized: IResponce = genericResponceMessage(200, 'Successfull', global.counter, data)
 
