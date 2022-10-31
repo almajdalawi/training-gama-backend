@@ -1,10 +1,10 @@
 import * as http from 'http'
 import * as data from '../static/data.json'
-import { BaseHandler } from '../controler/basehandler'
+import { BaseHandler } from './baseHandler'
 import { IBank, IUser } from '../interfaces/app-interfaces'
 import { User } from '../../payment-typescript/payment'
 import { EreqReserrorEventListener } from '../utils/EreqReserrorEventListener'
-import { genericResponceMessage } from '../utils/responceSerializer'
+import { genericResponceMessage } from '../utils/responseSerializer'
 import { IResponce } from '../interfaces/app-interfaces'
 
 

@@ -1,5 +1,5 @@
 import * as http from 'http'
-import { BaseHandler } from '../controler/basehandler'
+import { BaseHandler } from './baseHandler'
 
 
 export class MyErrorHandler {

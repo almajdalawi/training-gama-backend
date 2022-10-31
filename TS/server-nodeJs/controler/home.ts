@@ -1,7 +1,7 @@
 import * as http from 'http'
-import { BaseHandler } from '../controler/basehandler'
+import { BaseHandler } from './baseHandler'
 import { EreqReserrorEventListener } from '../utils/EreqReserrorEventListener'
-import { genericResponceMessage } from '../utils/responceSerializer'
+import { genericResponceMessage } from '../utils/responseSerializer'
 import { IResponce } from '../interfaces/app-interfaces'
 
 

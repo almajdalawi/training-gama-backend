@@ -1,8 +1,8 @@
 import * as http from 'http'
 import * as data from '../static/data.json'
 import { IBank, IProduct } from '../interfaces/app-interfaces'
-import { BaseHandler } from '../controler/basehandler'
-import { genericResponceMessage } from '../utils/responceSerializer'
+import { BaseHandler } from './baseHandler'
+import { genericResponceMessage } from '../utils/responseSerializer'
 import { IResponce } from '../interfaces/app-interfaces'
 
 

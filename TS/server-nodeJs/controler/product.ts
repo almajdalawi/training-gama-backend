@@ -2,9 +2,9 @@ import * as http from 'http'
 import * as data from '../static/data.json'
 import { Product } from '../../payment-typescript/payment'
 import { IProduct } from '../interfaces/app-interfaces'
-import { BaseHandler } from '../controler/basehandler'
+import { BaseHandler } from './baseHandler'
 import { EreqReserrorEventListener } from '../utils/EreqReserrorEventListener'
-import { genericResponceMessage } from '../utils/responceSerializer'
+import { genericResponceMessage } from '../utils/responseSerializer'
 import { IResponce } from '../interfaces/app-interfaces'
 
 

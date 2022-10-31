@@ -1,8 +1,8 @@
 import * as http from 'http'
 import * as os from 'os'
-import { genericResponceMessage } from '../utils/responceSerializer'
+import { genericResponceMessage } from '../utils/responseSerializer'
 import { EreqReserrorEventListener } from '../utils/EreqReserrorEventListener'
-import { BaseHandler } from '../controler/basehandler'
+import { BaseHandler } from './baseHandler'
 import { IOsInfo, IResponce } from '../interfaces/app-interfaces'
 
 
