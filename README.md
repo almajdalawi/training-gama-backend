@@ -20,7 +20,9 @@ This repo is for practicing backend skills
 ### Typescript
 
 - [Payment OOP TS](TS/payment-typescript/README.md)
-- [Node.js Server](TS/server nodeJs/README.md)
+- [Node.js Server](TS/server-nodeJs/README.md)
+- [Express Server](TS/server-express/README.md)
+-
 
 <br>
 
