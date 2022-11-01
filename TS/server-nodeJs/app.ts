@@ -3,18 +3,12 @@ import { HomeHandler } from './controler/home'
 import { ProductHandler } from './controler/product'
 import { UserHandler } from './controler/user'
 import { BankDetailsHandler, DepositHandler, WithdrawHandler, PurchaseHandler } from './controler/bank'
-import { MyErrorHandler } from './controler/Error'
+import { MyErrorHandler } from './controler/notFoundErrorHandler'
 import { OsInfoHandler } from './controler/osInfo'
 
 
 global.counter = 0
 
-// enum Methods {
-//     GET = 'GET',
-//     POST = 'POST',
-//     DELETE = 'DELETE',
-//     PATCH = 'PATCH'
-// }
 
 export const handleRequest = (req: http.IncomingMessage, res: http.ServerResponse) => {
     const url: string | undefined = req.url

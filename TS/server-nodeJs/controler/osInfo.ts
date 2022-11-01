@@ -1,6 +1,6 @@
 import * as http from 'http'
 import * as os from 'os'
-import { genericResponceMessage } from '../utils/responseSerializer'
+import { genericResponseMessage } from '../utils/responseSerializer'
 import { reqResErrorEventListener } from '../utils/EreqReserrorEventListener'
 import { BaseHandler } from './baseHandler'
 import { IOsInfo, IResponce } from '../interfaces/app-interfaces'
@@ -27,7 +27,7 @@ export class OsInfoHandler extends BaseHandler {
 
         reqResErrorEventListener(this.req, this.res)
 
-        let serialized: IResponce = genericResponceMessage(200, 'Successfull', global.counter, data)
+        let serialized: IResponce = genericResponseMessage(200, 'Successfull', global.counter, data)
 
         this.res.setHeader('Content-Type', 'application/json')
         this.res.write(JSON.stringify(serialized))

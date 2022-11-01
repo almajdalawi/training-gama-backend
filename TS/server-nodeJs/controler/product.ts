@@ -5,8 +5,10 @@ import { IProduct } from '../interfaces/app-interfaces'
 import { BaseHandler } from './baseHandler'
 import { reqResErrorEventListener, reqError, resError } from '../utils/EreqReserrorEventListener'
 import { prepareBody } from '../utils/prepareBody'
-import { genericResponceMessage } from '../utils/responseSerializer'
+import { genericResponseMessage } from '../utils/responseSerializer'
 import { IResponce } from '../interfaces/app-interfaces'
+import { isLargeFile } from '../utils/isLargFile'
+import { isCorrectFields } from '../utils/isCorrectFields'
 
 
 export class ProductHandler extends BaseHandler {
@@ -21,7 +23,7 @@ export class ProductHandler extends BaseHandler {
 
         reqResErrorEventListener(this.req, this.res)
 
-        let serialized: IResponce = genericResponceMessage(200, 'Successfull', global.counter, data.products)
+        let serialized: IResponce = genericResponseMessage(200, 'Successfull', global.counter, data.products)
 
         this.res.setHeader('Content-Type', 'application/json')
         this.res.write(JSON.stringify(serialized))
@@ -41,15 +43,24 @@ export class ProductHandler extends BaseHandler {
                 resError(this.res, err)
             });
 
-            body = prepareBody(body)
-            this.res.writeHead(200, { 'Content-Type': 'application/json' })
+            try {
+                isLargeFile(Buffer.concat(body).toString())
 
-            let newProduct: IProduct = new Product(body.name, body.price)
-            data.products.push(newProduct)
+                body = prepareBody(body)
+                isCorrectFields(body, 'name', 'price')
+                this.res.writeHead(200, { 'Content-Type': 'application/json' })
 
-            let serialized: IResponce = genericResponceMessage(200, 'Product added successfully', global.counter, data.products)
-            this.res.write(JSON.stringify(serialized))
-            this.res.end()
+                let newProduct: IProduct = new Product(body.name, body.price)
+                data.products.push(newProduct)
+
+                let serialized: IResponce = genericResponseMessage(200, 'Product added successfully', global.counter, data.products)
+                this.res.write(JSON.stringify(serialized))
+                this.res.end()
+            } catch (err: any) {
+                let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
+                this.res.write(JSON.stringify(serialized))
+                this.res.end()
+            }
         });
     }
 
@@ -66,27 +77,36 @@ export class ProductHandler extends BaseHandler {
                 resError(this.res, err)
             });
 
-            body = prepareBody(body)
-            this.res.writeHead(200, { 'Content-Type': 'application/json' })
+            try {
+                isLargeFile(Buffer.concat(body).toString())
 
-            let flag = false
-            for (let i = 0; i < data.products.length; i++) {
-                if (data.products[i].name == body.name) {
-                    delete data.products[i]
-                    flag = true
-                    break
+                body = prepareBody(body)
+                isCorrectFields(body, 'name', 'price')
+                this.res.writeHead(200, { 'Content-Type': 'application/json' })
+
+                let flag = false
+                for (let i = 0; i < data.products.length; i++) {
+                    if (data.products[i].name == body.name) {
+                        delete data.products[i]
+                        flag = true
+                        break
+                    }
                 }
-            }
 
-            if (flag) {
-                let serialized: IResponce = genericResponceMessage(200, 'Product removed successfully', global.counter, data.products)
-                this.res.write(JSON.stringify(serialized))
-            } else {
-                let serialized: IResponce = genericResponceMessage(500, 'Product Not found!', global.counter, {})
-                this.res.write(JSON.stringify(serialized))
-            }
+                if (flag) {
+                    let serialized: IResponce = genericResponseMessage(200, 'Product removed successfully', global.counter, data.products)
+                    this.res.write(JSON.stringify(serialized))
+                } else {
+                    let serialized: IResponce = genericResponseMessage(500, 'Product Not found!', global.counter, {})
+                    this.res.write(JSON.stringify(serialized))
+                }
 
-            this.res.end()
+                this.res.end()
+            } catch (err: any) {
+                let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
+                this.res.write(JSON.stringify(serialized))
+                this.res.end()
+            }
         });
     }
 
@@ -103,26 +123,35 @@ export class ProductHandler extends BaseHandler {
                 resError(this.res, err)
             });
 
-            body = prepareBody(body)
-            this.res.writeHead(200, { 'Content-Type': 'application/json' })
+            try {
+                isLargeFile(Buffer.concat(body).toString())
 
-            let flag = false
-            for (let i = 0; i < data.products.length; i++) {
-                if (data.products[i].name == body.name) {
-                    data.products[i].price = body.price
-                    flag = true
-                    break
+                body = prepareBody(body)
+                isCorrectFields(body, 'name', 'price')
+                this.res.writeHead(200, { 'Content-Type': 'application/json' })
+
+                let flag = false
+                for (let i = 0; i < data.products.length; i++) {
+                    if (data.products[i].name == body.name) {
+                        data.products[i].price = body.price
+                        flag = true
+                        break
+                    }
                 }
-            }
-            if (flag) {
-                let serialized: IResponce = genericResponceMessage(200, 'Product updated successfully', global.counter, data.products)
-                this.res.write(JSON.stringify(serialized))
-            } else {
-                let serialized: IResponce = genericResponceMessage(500, 'Product Not found!', global.counter, {})
-                this.res.write(JSON.stringify(serialized))
-            }
+                if (flag) {
+                    let serialized: IResponce = genericResponseMessage(200, 'Product updated successfully', global.counter, data.products)
+                    this.res.write(JSON.stringify(serialized))
+                } else {
+                    let serialized: IResponce = genericResponseMessage(500, 'Product Not found!', global.counter, {})
+                    this.res.write(JSON.stringify(serialized))
+                }
 
-            this.res.end()
+                this.res.end()
+            } catch (err: any) {
+                let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
+                this.res.write(JSON.stringify(serialized))
+                this.res.end()
+            }
         });
     }
 }
