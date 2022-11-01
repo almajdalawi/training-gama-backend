@@ -1,4 +1,3 @@
-import * as http from 'http'
 import { LargeFileErr } from './EreqReserrorEventListener'
 
 

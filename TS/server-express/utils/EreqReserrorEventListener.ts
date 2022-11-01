@@ -1,7 +1,7 @@
-import * as http from 'http'
+import { Request, Response } from 'express';
 
 
-export function reqResErrorEventListener(req: http.IncomingMessage, res: http.ServerResponse) {
+export function reqResErrorEventListener(req: Request, res: Response) {
     req.on('error', (err) => {
         console.error(err);
         res.statusCode = 400;
@@ -16,17 +16,6 @@ export function reqResErrorEventListener(req: http.IncomingMessage, res: http.Se
 
 }
 
-export function reqError(res: http.ServerResponse, err: Error): void {
-    console.error(err);
-    res.statusCode = 400;
-    res.end();
-}
-
-export function resError(res: http.ServerResponse, err: Error): void {
-    console.error(err);
-    res.statusCode = 500;
-    res.end();
-}
 
 export class LargeFileErr extends Error {
     isLarg: boolean

@@ -3,8 +3,7 @@ import { Request, Response } from 'express';
 import { BaseHandler } from './baseHandler'
 import { IUser } from '../interfaces/app-interfaces'
 import { User } from '../../payment-typescript/payment'
-import { reqResErrorEventListener, reqError, resError } from '../utils/EreqReserrorEventListener'
-import { prepareBody } from '../utils/prepareBody'
+import { reqResErrorEventListener } from '../utils/EreqReserrorEventListener'
 import { genericResponseMessage } from '../utils/responseSerializer'
 import { IResponce } from '../interfaces/app-interfaces'
 import { isLargeFile } from '../utils/isLargFile'
@@ -33,73 +32,50 @@ export class UserHandler extends BaseHandler {
     post(): void {
         global.counter++
 
-        let body: any = [];
-        this.req.on('error', (err) => {
-            reqError(this.res, err)
-        }).on('data', (chunk) => {
-            body.push(chunk);
-        }).on('end', () => {
-            this.res.on('error', (err) => {
-                resError(this.res, err)
-            });
+        try {
+            let body = this.req.body
+            isLargeFile(body.toString())
+            isCorrectFields(body, 'name')
 
-            try {
-                isLargeFile(Buffer.concat(body).toString())
+            let newUser: IUser = new User(body.name)
+            data.users.push(newUser)
 
-                body = prepareBody(body)
-                isCorrectFields(body, 'name')
-
-                let newUser: IUser = new User(body.name)
-                data.users.push(newUser)
-
-                let serialized: IResponce = genericResponseMessage(200, 'User added successfully', global.counter, data.users)
-                sendResponse(this.res, serialized)
-            } catch (err: any) {
-                let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
-                sendResponse(this.res, serialized)
-            }
-        });
+            let serialized: IResponce = genericResponseMessage(200, 'User added successfully', global.counter, data.users)
+            sendResponse(this.res, serialized)
+        } catch (err: any) {
+            let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
+            sendResponse(this.res, serialized)
+        }
     }
 
     delete(): void {
         global.counter++
 
-        let body: any = [];
-        this.req.on('error', (err) => {
-            reqError(this.res, err)
-        }).on('data', (chunk) => {
-            body.push(chunk);
-        }).on('end', () => {
-            this.res.on('error', (err) => {
-                resError(this.res, err)
-            });
-            try {
-                isLargeFile(Buffer.concat(body).toString())
+        try {
+            let body = this.req.body
+            isLargeFile(body.toString())
+            isCorrectFields(body, 'name')
 
-                body = prepareBody(body)
-                isCorrectFields(body, 'name')
-
-                let flag = false
-                for (let i = 0; i < data.users.length; i++) {
-                    if (data.users[i].name == body.name) {
-                        delete data.users[i]
-                        flag = true
-                        break
-                    }
+            let flag = false
+            for (let i = 0; i < data.users.length; i++) {
+                if (data.users[i].name == body.name) {
+                    delete data.users[i]
+                    flag = true
+                    break
                 }
+            }
 
-                if (flag) {
-                    let serialized: IResponce = genericResponseMessage(200, 'User removed successfully', global.counter, data.users)
-                    sendResponse(this.res, serialized)
-                } else {
-                    let serialized: IResponce = genericResponseMessage(200, 'User Not found!', global.counter, {})
-                    sendResponse(this.res, serialized)
-                }
-            } catch (err: any) {
-                let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
+            if (flag) {
+                let serialized: IResponce = genericResponseMessage(200, 'User removed successfully', global.counter, data.users)
+                sendResponse(this.res, serialized)
+            } else {
+                let serialized: IResponce = genericResponseMessage(200, 'User Not found!', global.counter, {})
                 sendResponse(this.res, serialized)
             }
-        });
+        } catch (err: any) {
+            let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
+            sendResponse(this.res, serialized)
+        }
     }
 
 

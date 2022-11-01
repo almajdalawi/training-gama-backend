@@ -3,8 +3,6 @@ import { Request, Response } from 'express';
 import { IBank, IProduct } from '../interfaces/app-interfaces'
 import { BaseHandler } from './baseHandler'
 import { genericResponseMessage } from '../utils/responseSerializer'
-import { reqError, resError } from '../utils/EreqReserrorEventListener'
-import { prepareBody } from '../utils/prepareBody'
 import { IResponce } from '../interfaces/app-interfaces'
 import { isLargeFile } from '../utils/isLargFile'
 import { isCorrectFields } from '../utils/isCorrectFields'
@@ -22,45 +20,31 @@ export class BankDetailsHandler extends BaseHandler {
     get(): void {
         global.counter++
 
-        let body: any = [];
-        this.req.on('error', (err) => {
-            reqError(this.res, err)
-        }).on('data', (chunk) => {
-            body.push(chunk);
-        }).on('end', () => {
-            this.res.on('error', (err) => {
-                resError(this.res, err)
-            });
+        try {
+            let body = this.req.body
+            isLargeFile(body.toString())
+            isCorrectFields(body, 'name')
 
-            try {
-                isLargeFile(Buffer.concat(body).toString())
-
-                body = prepareBody(body)
-                isCorrectFields(body, 'name')
-
-                let bankDetails: IBank
-                let flag = false
-                for (let i = 0; i < data.users.length; i++) {
-                    if (data.users[i].name == body.name) {
-                        bankDetails = data.users[i].bankAccount
-                        flag = true
-                        let serialized: IResponce = genericResponseMessage(200, 'Bank details fetched successfull', global.counter, bankDetails)
-                        sendResponse(this.res, serialized)
-                        break
-                    }
-                }
-
-                if (!flag) {
-                    let serialized: IResponce = genericResponseMessage(200, 'User Not found!', global.counter, {})
+            let bankDetails: IBank
+            let flag = false
+            for (let i = 0; i < data.users.length; i++) {
+                if (data.users[i].name == body.name) {
+                    bankDetails = data.users[i].bankAccount
+                    flag = true
+                    let serialized: IResponce = genericResponseMessage(200, 'Bank details fetched successfull', global.counter, bankDetails)
                     sendResponse(this.res, serialized)
+                    break
                 }
+            }
 
-                this.res.end()
-            } catch (err: any) {
-                let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
+            if (!flag) {
+                let serialized: IResponce = genericResponseMessage(200, 'User Not found!', global.counter, {})
                 sendResponse(this.res, serialized)
             }
-        });
+        } catch (err: any) {
+            let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
+            sendResponse(this.res, serialized)
+        }
     }
 
     post(): void { }
@@ -81,48 +65,34 @@ export class DepositHandler extends BaseHandler {
     post(): void {
         global.counter++
 
-        let body: any = [];
-        this.req.on('error', (err) => {
-            reqError(this.res, err)
-        }).on('data', (chunk) => {
-            body.push(chunk);
-        }).on('end', () => {
-            this.res.on('error', (err) => {
-                resError(this.res, err)
-            });
+        try {
+            let body = this.req.body
+            isLargeFile(body.toString())
+            isCorrectFields(body, 'name', 'amount', 'type')
 
-            try {
-                isLargeFile(Buffer.concat(body).toString())
-
-                body = prepareBody(body)
-                isCorrectFields(body, 'name', 'amount')
-
-                let flag = false
-                for (let i = 0; i < data.users.length; i++) {
-                    if (data.users[i].name == body.name) {
-                        if (body.type == 'cash') {
-                            data.users[i].bankAccount.cashBalance += body.amount
-                        } else if (body.type == 'credit') {
-                            data.users[i].bankAccount.creditBalance += body.amount
-                        }
-                        flag = true
-                        let serialized: IResponce = genericResponseMessage(200, 'Deposit Done successfull', global.counter, data.users[i].bankAccount)
-                        sendResponse(this.res, serialized)
-                        break
+            let flag = false
+            for (let i = 0; i < data.users.length; i++) {
+                if (data.users[i].name == body.name) {
+                    if (body.type == 'cash') {
+                        data.users[i].bankAccount.cashBalance += body.amount
+                    } else if (body.type == 'credit') {
+                        data.users[i].bankAccount.creditBalance += body.amount
                     }
-                }
-
-                if (!flag) {
-                    let serialized: IResponce = genericResponseMessage(200, 'User Not found!', global.counter, {})
+                    flag = true
+                    let serialized: IResponce = genericResponseMessage(200, 'Deposit Done successfull', global.counter, data.users[i].bankAccount)
                     sendResponse(this.res, serialized)
+                    break
                 }
+            }
 
-                this.res.end()
-            } catch (err: any) {
-                let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
+            if (!flag) {
+                let serialized: IResponce = genericResponseMessage(200, 'User Not found!', global.counter, {})
                 sendResponse(this.res, serialized)
             }
-        });
+        } catch (err: any) {
+            let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
+            sendResponse(this.res, serialized)
+        }
     }
 
     get(): void { }
@@ -143,62 +113,48 @@ export class WithdrawHandler extends BaseHandler {
     post(): void {
         global.counter++
 
-        let body: any = [];
-        this.req.on('error', (err) => {
-            reqError(this.res, err)
-        }).on('data', (chunk) => {
-            body.push(chunk);
-        }).on('end', () => {
-            this.res.on('error', (err) => {
-                resError(this.res, err)
-            });
+        try {
+            let body = this.req.body
+            isLargeFile(body.toString())
+            isCorrectFields(body, 'name', 'amount', 'type')
 
-            try {
-                isLargeFile(Buffer.concat(body).toString())
-
-                body = prepareBody(body)
-                isCorrectFields(body, 'name', 'amount')
-
-                let flag = false
-                for (let i = 0; i < data.users.length; i++) {
-                    if (data.users[i].name == body.name) {
-                        if (body.type == 'cash') {
-                            if (data.users[i].bankAccount.cashBalance >= body.amount) {
-                                data.users[i].bankAccount.cashBalance -= body.amount
-                            }
-                            else {
-                                let serialized: IResponce = genericResponseMessage(500, 'Not suficient money!', global.counter, {})
-                                sendResponse(this.res, serialized)
-                                return
-                            }
-                        } else if (body.type == 'credit') {
-                            if (data.users[i].bankAccount.creditBalance >= body.amount) {
-                                data.users[i].bankAccount.creditBalance -= body.amount
-                            }
-                            else {
-                                let serialized: IResponce = genericResponseMessage(500, 'Not suficient money!', global.counter, {})
-                                sendResponse(this.res, serialized)
-                                return
-                            }
+            let flag = false
+            for (let i = 0; i < data.users.length; i++) {
+                if (data.users[i].name == body.name) {
+                    if (body.type == 'cash') {
+                        if (data.users[i].bankAccount.cashBalance >= body.amount) {
+                            data.users[i].bankAccount.cashBalance -= body.amount
                         }
-                        flag = true
-                        let serialized: IResponce = genericResponseMessage(200, 'Withdraw Done successfull', global.counter, data.users[i].bankAccount)
-                        sendResponse(this.res, serialized)
-                        break
+                        else {
+                            let serialized: IResponce = genericResponseMessage(500, 'Not suficient money!', global.counter, {})
+                            sendResponse(this.res, serialized)
+                            return
+                        }
+                    } else if (body.type == 'credit') {
+                        if (data.users[i].bankAccount.creditBalance >= body.amount) {
+                            data.users[i].bankAccount.creditBalance -= body.amount
+                        }
+                        else {
+                            let serialized: IResponce = genericResponseMessage(500, 'Not suficient money!', global.counter, {})
+                            sendResponse(this.res, serialized)
+                            return
+                        }
                     }
-                }
-
-                if (!flag) {
-                    let serialized: IResponce = genericResponseMessage(500, 'User Not found!', global.counter, {})
+                    flag = true
+                    let serialized: IResponce = genericResponseMessage(200, 'Withdraw Done successfull', global.counter, data.users[i].bankAccount)
                     sendResponse(this.res, serialized)
+                    break
                 }
+            }
 
-                this.res.end()
-            } catch (err: any) {
-                let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
+            if (!flag) {
+                let serialized: IResponce = genericResponseMessage(500, 'User Not found!', global.counter, {})
                 sendResponse(this.res, serialized)
             }
-        });
+        } catch (err: any) {
+            let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
+            sendResponse(this.res, serialized)
+        }
     }
 
     get(): void { }
@@ -219,81 +175,67 @@ export class PurchaseHandler extends BaseHandler {
     post(): void {
         global.counter++
 
-        let body: any = [];
-        this.req.on('error', (err) => {
-            reqError(this.res, err)
-        }).on('data', (chunk) => {
-            body.push(chunk);
-        }).on('end', () => {
-            this.res.on('error', (err) => {
-                resError(this.res, err)
-            });
+        try {
+            let body = this.req.body
+            isLargeFile(body.toString())
+            isCorrectFields(body, 'productName', 'username', 'type')
 
-            try {
-                isLargeFile(Buffer.concat(body).toString())
-
-                body = prepareBody(body)
-                isCorrectFields(body, 'name', 'amount')
-
-                let theProduct: IProduct = { name: '', price: 0 }
-                let flag = false
-                for (let i = 0; i < data.products.length; i++) {
-                    if (data.products[i].name == body.productName) {
-                        theProduct = data.products[i]
-                        flag = true
-                        break
-                    }
+            let theProduct: IProduct = { name: '', price: 0 }
+            let flag = false
+            for (let i = 0; i < data.products.length; i++) {
+                if (data.products[i].name == body.productName) {
+                    theProduct = data.products[i]
+                    flag = true
+                    break
                 }
+            }
 
-                if (!flag) {
-                    let serialized: IResponce = genericResponseMessage(500, 'Product Not found!', global.counter, {})
-                    sendResponse(this.res, serialized)
-                }
+            if (!flag) {
+                let serialized: IResponce = genericResponseMessage(500, 'Product Not found!', global.counter, {})
+                sendResponse(this.res, serialized)
+            }
 
-                let flag2 = false
-                for (let i = 0; i < data.users.length; i++) {
-                    if (data.users[i].name == body.username) {
-                        if (body.type == 'cash') {
-                            if (data.users[i].bankAccount.cashBalance >= theProduct.price) {
-                                data.users[i].bankAccount.cashBalance -= theProduct.price
-                            }
-                            else {
-                                let serialized: IResponce = genericResponseMessage(500, 'Not suficient money!', global.counter, {})
-                                sendResponse(this.res, serialized)
-                                return
-                            }
-                        } else if (body.type == 'credit') {
-                            if (data.users[i].bankAccount.creditBalance >= theProduct.price) {
-                                data.users[i].bankAccount.creditBalance -= theProduct.price
-                            }
-                            else {
-                                let serialized: IResponce = genericResponseMessage(500, 'Not suficient money!', global.counter, {})
-                                sendResponse(this.res, serialized)
-                                return
-                            }
-                        } else {
-                            let serialized: IResponce = genericResponseMessage(500, 'Payment method not correct, Please enter "cash" or "credit"', global.counter, {})
+            let flag2 = false
+            for (let i = 0; i < data.users.length; i++) {
+                if (data.users[i].name == body.username) {
+                    if (body.type == 'cash') {
+                        if (data.users[i].bankAccount.cashBalance >= theProduct.price) {
+                            data.users[i].bankAccount.cashBalance -= theProduct.price
+                        }
+                        else {
+                            let serialized: IResponce = genericResponseMessage(500, 'Not suficient money!', global.counter, {})
                             sendResponse(this.res, serialized)
                             return
                         }
-                        flag2 = true
-                        let serialized: IResponce = genericResponseMessage(200, `Payment succeded, you purchased a ${theProduct.price}`, global.counter, data.users[i].bankAccount)
+                    } else if (body.type == 'credit') {
+                        if (data.users[i].bankAccount.creditBalance >= theProduct.price) {
+                            data.users[i].bankAccount.creditBalance -= theProduct.price
+                        }
+                        else {
+                            let serialized: IResponce = genericResponseMessage(500, 'Not suficient money!', global.counter, {})
+                            sendResponse(this.res, serialized)
+                            return
+                        }
+                    } else {
+                        let serialized: IResponce = genericResponseMessage(500, 'Payment method not correct, Please enter "cash" or "credit"', global.counter, {})
                         sendResponse(this.res, serialized)
-                        break
+                        return
                     }
-                }
-
-                if (!flag2) {
-                    let serialized: IResponce = genericResponseMessage(500, 'User Not found!', global.counter, {})
+                    flag2 = true
+                    let serialized: IResponce = genericResponseMessage(200, `Payment succeded, you purchased a ${theProduct.price}`, global.counter, data.users[i].bankAccount)
                     sendResponse(this.res, serialized)
+                    break
                 }
+            }
 
-                this.res.end()
-            } catch (err: any) {
-                let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
+            if (!flag2) {
+                let serialized: IResponce = genericResponseMessage(500, 'User Not found!', global.counter, {})
                 sendResponse(this.res, serialized)
             }
-        });
+        } catch (err: any) {
+            let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
+            sendResponse(this.res, serialized)
+        }
     }
 
     get(): void { }

@@ -9,8 +9,6 @@ export function isCorrectFields(theJSON: any, ...args: any) {
     let fields = Object.keys(theJSON)
     let flage: boolean = true
 
-    console.log(wantedFields, fields, fields.length == wantedFields.length)
-
     if (fields.length == wantedFields.length) {
         wantedFields.forEach((field: string) => {
             if (!(fields.includes(field))) { flage = false }

@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv'
+import bodyParser from 'body-parser'
 import express from 'express'
 import { Express, Request, Response } from 'express';
 import { HomeRoutes, ProducRoutes, UserRoutes, BankDetailsRoutes, DepositRoutes, WithdrawRoutes, PerchaseRoutes, OsRoutes } from './routes/routes';
@@ -10,7 +11,8 @@ const port: number = process.env.PORT ? parseInt(process.env.PORT) : 0
 global.counter = 0
 
 export const app: Express = express()
-
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
 Object.values(new HomeRoutes(app).getRoutes())
 Object.values(new ProducRoutes(app).getRoutes())
