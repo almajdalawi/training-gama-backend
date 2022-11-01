@@ -133,3 +133,5 @@ dist
 .backup
 .git.backup
 .vscode
+build
+TS/build

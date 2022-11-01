@@ -1,4 +1,4 @@
-import { User, Product } from './payment.js';
+import { User, Product } from './payment';
 
 
 let car = new Product('Car', 12000)
