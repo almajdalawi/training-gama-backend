@@ -15,7 +15,7 @@ export class HomeRoutes {
         this.app = app
     }
 
-    getRoutes() {
+    get routes() {
         let routs: IRouteMethods = {
             getMethod: this.app.get('/', (req: Request, res: Response) => { new HomeHandler(req, res).get(); }),
             postMethod: this.app.get('/', (req: Request, res: Response) => { new HomeHandler(req, res).post(); }),
@@ -34,7 +34,7 @@ export class ProducRoutes {
         this.app = app
     }
 
-    getRoutes() {
+    get routes() {
         let routs: IRouteMethods = {
             getMethod: this.app.get('/product', (req: Request, res: Response) => { new ProductHandler(req, res).get(); }),
             postMethod: this.app.post('/product', (req: Request, res: Response) => { new ProductHandler(req, res).post(); }),
@@ -53,7 +53,7 @@ export class UserRoutes {
         this.app = app
     }
 
-    getRoutes() {
+    get routes() {
         let routs: IRouteMethods = {
             getMethod: this.app.get('/user', (req: Request, res: Response) => { new UserHandler(req, res).get(); }),
             postMethod: this.app.post('/user', (req: Request, res: Response) => { new UserHandler(req, res).post(); }),
@@ -72,7 +72,7 @@ export class BankDetailsRoutes {
         this.app = app
     }
 
-    getRoutes() {
+    get routes() {
         let routs: IRouteMethods = {
             getMethod: this.app.get('/bank', (req: Request, res: Response) => { new BankDetailsHandler(req, res).get(); }),
             postMethod: this.app.post('/bank', (req: Request, res: Response) => { new BankDetailsHandler(req, res).post(); }),
@@ -91,7 +91,7 @@ export class DepositRoutes {
         this.app = app
     }
 
-    getRoutes() {
+    get routes() {
         let routs: IRouteMethods = {
             getMethod: this.app.get('/deposit', (req: Request, res: Response) => { new DepositHandler(req, res).get(); }),
             postMethod: this.app.post('/deposit', (req: Request, res: Response) => { new DepositHandler(req, res).post(); }),
@@ -110,7 +110,7 @@ export class WithdrawRoutes {
         this.app = app
     }
 
-    getRoutes() {
+    get routes() {
         let routs: IRouteMethods = {
             getMethod: this.app.get('/withdraw', (req: Request, res: Response) => { new WithdrawHandler(req, res).get(); }),
             postMethod: this.app.post('/withdraw', (req: Request, res: Response) => { new WithdrawHandler(req, res).post(); }),
@@ -129,7 +129,7 @@ export class PerchaseRoutes {
         this.app = app
     }
 
-    getRoutes() {
+    get routes() {
         let routs: IRouteMethods = {
             getMethod: this.app.get('/purchase', (req: Request, res: Response) => { new PurchaseHandler(req, res).get(); }),
             postMethod: this.app.post('/purchase', (req: Request, res: Response) => { new PurchaseHandler(req, res).post(); }),
@@ -148,7 +148,7 @@ export class OsRoutes {
         this.app = app
     }
 
-    getRoutes() {
+    get routes() {
         let routs: IRouteMethods = {
             getMethod: this.app.get('/os', (req: Request, res: Response) => { new OsInfoHandler(req, res).get(); }),
             postMethod: this.app.post('/os', (req: Request, res: Response) => { new OsInfoHandler(req, res).post(); }),

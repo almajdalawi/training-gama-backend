@@ -11,17 +11,17 @@ const port: number = process.env.PORT ? parseInt(process.env.PORT) : 0
 global.counter = 0
 
 export const app: Express = express()
-app.use(bodyParser.urlencoded({ extended: false }))
+// app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-Object.values(new HomeRoutes(app).getRoutes())
-Object.values(new ProducRoutes(app).getRoutes())
-Object.values(new UserRoutes(app).getRoutes())
-Object.values(new BankDetailsRoutes(app).getRoutes())
-Object.values(new DepositRoutes(app).getRoutes())
-Object.values(new WithdrawRoutes(app).getRoutes())
-Object.values(new PerchaseRoutes(app).getRoutes())
-Object.values(new OsRoutes(app).getRoutes())
+Object.values(new HomeRoutes(app).routes)
+Object.values(new ProducRoutes(app).routes)
+Object.values(new UserRoutes(app).routes)
+Object.values(new BankDetailsRoutes(app).routes)
+Object.values(new DepositRoutes(app).routes)
+Object.values(new WithdrawRoutes(app).routes)
+Object.values(new PerchaseRoutes(app).routes)
+Object.values(new OsRoutes(app).routes)
 
 
 
