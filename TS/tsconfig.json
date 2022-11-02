@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "ESNext",
+        "target": "es5",
         "allowJs": true,
         "checkJs": true,
         "skipLibCheck": true,
@@ -9,7 +9,7 @@
         "strict": true,
         "forceConsistentCasingInFileNames": true,
         "noFallthroughCasesInSwitch": true,
-        "module": "ESNext",
+        "module": "es2022",
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "isolatedModules": false,
