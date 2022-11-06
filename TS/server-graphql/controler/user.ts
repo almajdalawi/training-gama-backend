@@ -1,8 +1,6 @@
-import { data } from '../data'
+import * as dotenv from 'dotenv'
 import { Request, Response } from 'express';
 import { BaseHandler } from './baseHandler'
-import { IUser } from '../interfaces/app-interfaces'
-import { User } from '../../payment-typescript/payment'
 import { reqResErrorEventListener } from '../utils/EreqReserrorEventListener'
 import { genericResponseMessage } from '../utils/responseSerializer'
 import { IResponce } from '../interfaces/app-interfaces'
@@ -10,6 +8,9 @@ import { isLargeFile } from '../utils/isLargFile'
 import { isCorrectFields } from '../utils/isCorrectFields'
 import { sendResponse } from '../utils/sendResponse';
 
+
+dotenv.config()
+const port: string = process.env.PORT ? process.env.PORT.toString() : '0'
 
 
 export class UserHandler extends BaseHandler {
@@ -19,17 +20,33 @@ export class UserHandler extends BaseHandler {
         this.res = res
     }
 
-    get(): void {
+    async get() {
         global.counter++
 
         reqResErrorEventListener(this.req, this.res)
 
-        let serialized: IResponce = genericResponseMessage(200, 'Successfull', global.counter, data.users)
+        // get products using graphQL
+        let fetched = await fetch(`http://localhost:${port}/graphql`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                query: `{
+                    getUsers{
+                        name
+                        bankAccount{cashBalance creditBalance}
+                    }
+                }`
+            }),
+        }).then(res => res.json())
+
+        let serialized: IResponce = genericResponseMessage(200, 'Successfull', global.counter, fetched)
         sendResponse(this.res, serialized)
     }
 
 
-    post(): void {
+    async post() {
         global.counter++
 
         try {
@@ -37,10 +54,29 @@ export class UserHandler extends BaseHandler {
             isLargeFile(body.toString())
             isCorrectFields(body, 'name')
 
-            let newUser: IUser = new User(body.name)
-            data.users.push(newUser)
+            // post users using graphQL
+            let fetched = await fetch(`http://localhost:${port}/graphql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    query: `mutation{
+            createUser(nameArg:$nameVar){
+              name
+              bankAccount{
+                cashBalance
+                creditBalance
+                   }
+               }
+            }`,
+                    variables: {
+                        nameVar: body.name,
+                    }
+                }),
+            }).then(res => res.json())
 
-            let serialized: IResponce = genericResponseMessage(200, 'User added successfully', global.counter, data.users)
+            let serialized: IResponce = genericResponseMessage(200, 'User added successfully', global.counter, fetched)
             sendResponse(this.res, serialized)
         } catch (err: any) {
             let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
@@ -48,7 +84,7 @@ export class UserHandler extends BaseHandler {
         }
     }
 
-    delete(): void {
+    async delete() {
         global.counter++
 
         try {
@@ -56,20 +92,30 @@ export class UserHandler extends BaseHandler {
             isLargeFile(body.toString())
             isCorrectFields(body, 'name')
 
-            let flag = false
-            for (let i = 0; i < data.users.length; i++) {
-                if (data.users[i].name == body.name) {
-                    delete data.users[i]
-                    flag = true
-                    break
+            // delete users using graphQL
+            let fetched = await fetch(`http://localhost:${port}/graphql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    query: `mutation{
+                deleteUser(nameArg:$nameVar){
+                 name
                 }
-            }
+            }`,
+                    variables: {
+                        nameVar: body.name
+                    }
+                }),
+            }).then(res => res.json())
 
-            if (flag) {
-                let serialized: IResponce = genericResponseMessage(200, 'User removed successfully', global.counter, data.users)
+
+            if (!fetched.data) {
+                let serialized: IResponce = genericResponseMessage(200, 'User Not found!', global.counter, {})
                 sendResponse(this.res, serialized)
             } else {
-                let serialized: IResponce = genericResponseMessage(200, 'User Not found!', global.counter, {})
+                let serialized: IResponce = genericResponseMessage(200, 'User removed successfully', global.counter, fetched)
                 sendResponse(this.res, serialized)
             }
         } catch (err: any) {

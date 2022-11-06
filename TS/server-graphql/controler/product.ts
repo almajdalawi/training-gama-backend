@@ -1,7 +1,5 @@
-import { data } from '../data'
+import * as dotenv from 'dotenv'
 import { Request, Response } from 'express';
-import { Product } from '../../payment-typescript/payment'
-import { IProduct } from '../interfaces/app-interfaces'
 import { BaseHandler } from './baseHandler'
 import { reqResErrorEventListener } from '../utils/EreqReserrorEventListener'
 import { genericResponseMessage } from '../utils/responseSerializer'
@@ -11,26 +9,43 @@ import { isCorrectFields } from '../utils/isCorrectFields'
 import { sendResponse } from '../utils/sendResponse';
 
 
+dotenv.config()
+const port: string = process.env.PORT ? process.env.PORT.toString() : '0'
+
 export class ProductHandler extends BaseHandler {
     constructor(private req: Request, private res: Response) {
         super()
         this.req = req
         this.res = res
-
-        // this.req.method ? this[this.req.method?.toLocaleLowerCase()] : null
     }
 
-    get(): void {
+    async get() {
         global.counter++
 
         reqResErrorEventListener(this.req, this.res)
 
+        // get products using graphQL
+        let fetched = await fetch(`http://localhost:${port}/graphql`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                query: `{
+                    getProducts{
+                        name
+                        price
+                    }
+                }`
+            })
+        }).then(res => res.json())
 
-        let serialized: IResponce = genericResponseMessage(200, 'Data successfully fetched ', global.counter, data.products)
+
+        let serialized: IResponce = genericResponseMessage(200, 'Data successfully fetched ', global.counter, fetched)
         sendResponse(this.res, serialized)
     }
 
-    post(): void {
+    async post() {
         global.counter++
 
         try {
@@ -38,10 +53,26 @@ export class ProductHandler extends BaseHandler {
             isLargeFile(body.toString())
             isCorrectFields(body, 'name', 'price')
 
-            let newProduct: IProduct = new Product(body.name, body.price)
-            data.products.push(newProduct)
+            // post products using graphQL
+            let fetched = await fetch(`http://localhost:${port}/graphql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    query: `mutation{
+                        createProduct(nameArg: $nameVar, priceArg: $priceVar) {
+                          name
+                        }
+                      }`,
+                    variables: {
+                        nameVar: body.name,
+                        priceVar: body.price
+                    }
+                }),
+            }).then(res => res.json())
 
-            let serialized: IResponce = genericResponseMessage(200, 'Product added successfully', global.counter, data.products)
+            let serialized: IResponce = genericResponseMessage(200, 'Product added successfully', global.counter, fetched)
             sendResponse(this.res, serialized)
         } catch (err: any) {
             let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
@@ -49,7 +80,7 @@ export class ProductHandler extends BaseHandler {
         }
     }
 
-    delete(): void {
+    async delete() {
         global.counter++
 
         try {
@@ -57,20 +88,29 @@ export class ProductHandler extends BaseHandler {
             isLargeFile(body.toString())
             isCorrectFields(body, 'name')
 
-            let flag = false
-            for (let i = 0; i < data.products.length; i++) {
-                if (data.products[i].name == body.name) {
-                    delete data.products[i]
-                    flag = true
-                    break
-                }
-            }
+            // delete products using graphQL
+            let fetched = await fetch(`http://localhost:${port}/graphql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    query: `mutation{
+                        deleteProduct(nameArg: $nameVar) {
+                          name
+                        }
+                      }`,
+                    variables: {
+                        nameVar: body.name
+                    }
+                }),
+            }).then(res => res.json())
 
-            if (flag) {
-                let serialized: IResponce = genericResponseMessage(200, 'Product removed successfully', global.counter, data.products)
+            if (!fetched.data) {
+                let serialized: IResponce = genericResponseMessage(500, 'Product Not found!', global.counter, {})
                 sendResponse(this.res, serialized)
             } else {
-                let serialized: IResponce = genericResponseMessage(500, 'Product Not found!', global.counter, {})
+                let serialized: IResponce = genericResponseMessage(200, 'Product removed successfully', global.counter, fetched)
                 sendResponse(this.res, serialized)
             }
         } catch (err: any) {
@@ -79,7 +119,7 @@ export class ProductHandler extends BaseHandler {
         }
     }
 
-    patch(): void {
+    async patch() {
         global.counter++
 
         try {
@@ -87,22 +127,32 @@ export class ProductHandler extends BaseHandler {
             isLargeFile(body.toString())
             isCorrectFields(body, 'name', 'price')
 
-            let flag = false
-            for (let i = 0; i < data.products.length; i++) {
-                if (data.products[i].name == body.name) {
-                    data.products[i].price = body.price
-                    flag = true
-                    break
-                }
-            }
-            if (flag) {
-                let serialized: IResponce = genericResponseMessage(200, 'Product updated successfully', global.counter, data.products)
-                sendResponse(this.res, serialized)
-            } else {
+            // update products using graphQL
+            let fetched = await fetch(`http://localhost:${port}/graphql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    query: `mutation{
+                        updateProduct(nameArg: $nameVar, priceArg: $priceVar) {
+                          name
+                        }
+                      }`,
+                    variables: {
+                        nameVar: body.name,
+                        priceVar: body.price
+                    }
+                }),
+            }).then(res => res.json())
+
+            if (!fetched.data) {
                 let serialized: IResponce = genericResponseMessage(500, 'Product Not found!', global.counter, {})
                 sendResponse(this.res, serialized)
+            } else {
+                let serialized: IResponce = genericResponseMessage(200, 'Product updated successfully', global.counter, fetched)
+                sendResponse(this.res, serialized)
             }
-
         } catch (err: any) {
             let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
             sendResponse(this.res, serialized)

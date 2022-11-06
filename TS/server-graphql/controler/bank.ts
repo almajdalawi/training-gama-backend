@@ -1,6 +1,5 @@
-import { data } from '../data'
+import * as dotenv from 'dotenv'
 import { Request, Response } from 'express';
-import { IBank, IProduct } from '../interfaces/app-interfaces'
 import { BaseHandler } from './baseHandler'
 import { genericResponseMessage } from '../utils/responseSerializer'
 import { IResponce } from '../interfaces/app-interfaces'
@@ -8,7 +7,8 @@ import { isLargeFile } from '../utils/isLargFile'
 import { isCorrectFields } from '../utils/isCorrectFields'
 import { sendResponse } from '../utils/sendResponse';
 
-
+dotenv.config()
+const port: string = process.env.PORT ? process.env.PORT.toString() : '0'
 
 export class BankDetailsHandler extends BaseHandler {
     constructor(private req: Request, private res: Response) {
@@ -17,7 +17,7 @@ export class BankDetailsHandler extends BaseHandler {
         this.res = res
     }
 
-    get(): void {
+    async get() {
         global.counter++
 
         try {
@@ -25,20 +25,30 @@ export class BankDetailsHandler extends BaseHandler {
             isLargeFile(body.toString())
             isCorrectFields(body, 'name')
 
-            let bankDetails: IBank
-            let flag = false
-            for (let i = 0; i < data.users.length; i++) {
-                if (data.users[i].name == body.name) {
-                    bankDetails = data.users[i].bankAccount
-                    flag = true
-                    let serialized: IResponce = genericResponseMessage(200, 'Bank details fetched successfull', global.counter, bankDetails)
-                    sendResponse(this.res, serialized)
-                    break
-                }
-            }
+            // get bank details using graphQL
+            let fetched = await fetch(`http://localhost:${port}/graphql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    query: `query{
+                        getBankDetails(usernameArg: $usernameVar){
+                          cashBalance
+                          creditBalance
+                        }
+                      }`,
+                    variables: {
+                        usernameVar: body.name,
+                    }
+                }),
+            }).then(res => res.json())
 
-            if (!flag) {
+            if (fetched.data === null) {
                 let serialized: IResponce = genericResponseMessage(200, 'User Not found!', global.counter, {})
+                sendResponse(this.res, serialized)
+            } else {
+                let serialized: IResponce = genericResponseMessage(200, 'Bank details fetched successfull', global.counter, fetched)
                 sendResponse(this.res, serialized)
             }
         } catch (err: any) {
@@ -62,7 +72,7 @@ export class DepositHandler extends BaseHandler {
         this.res = res
     }
 
-    post(): void {
+    async post() {
         global.counter++
 
         try {
@@ -70,23 +80,33 @@ export class DepositHandler extends BaseHandler {
             isLargeFile(body.toString())
             isCorrectFields(body, 'name', 'amount', 'type')
 
-            let flag = false
-            for (let i = 0; i < data.users.length; i++) {
-                if (data.users[i].name == body.name) {
-                    if (body.type == 'cash') {
-                        data.users[i].bankAccount.cashBalance += body.amount
-                    } else if (body.type == 'credit') {
-                        data.users[i].bankAccount.creditBalance += body.amount
-                    }
-                    flag = true
-                    let serialized: IResponce = genericResponseMessage(200, 'Deposit Done successfull', global.counter, data.users[i].bankAccount)
-                    sendResponse(this.res, serialized)
-                    break
-                }
-            }
 
-            if (!flag) {
-                let serialized: IResponce = genericResponseMessage(200, 'User Not found!', global.counter, {})
+            // deposit using graphQL
+            let fetched = await fetch(`http://localhost:${port}/graphql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    query: `mutation{
+                        deposit(usernameArg: $usernameVar, amountArg: $amountVar, typeArg: $typeVar){
+                            cashBalance
+                            creditBalance
+                        }
+                      }`,
+                    variables: {
+                        usernameVar: body.name,
+                        amountVar: body.amount,
+                        typeVar: body.type
+                    }
+                }),
+            }).then(res => res.json())
+
+            if (fetched.data === null) {
+                let serialized: IResponce = genericResponseMessage(200, 'User Not found or Payment method is incorrect', global.counter, {})
+                sendResponse(this.res, serialized)
+            } else {
+                let serialized: IResponce = genericResponseMessage(200, 'Deposit Done successfull', global.counter, fetched)
                 sendResponse(this.res, serialized)
             }
         } catch (err: any) {
@@ -110,7 +130,7 @@ export class WithdrawHandler extends BaseHandler {
         this.res = res
     }
 
-    post(): void {
+    async post() {
         global.counter++
 
         try {
@@ -118,37 +138,32 @@ export class WithdrawHandler extends BaseHandler {
             isLargeFile(body.toString())
             isCorrectFields(body, 'name', 'amount', 'type')
 
-            let flag = false
-            for (let i = 0; i < data.users.length; i++) {
-                if (data.users[i].name == body.name) {
-                    if (body.type == 'cash') {
-                        if (data.users[i].bankAccount.cashBalance >= body.amount) {
-                            data.users[i].bankAccount.cashBalance -= body.amount
+            // withdraw using graphQL
+            let fetched = await fetch(`http://localhost:${port}/graphql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    query: `mutation{
+                        withdraw(usernameArg: $usernameVar, amountArg: $amountVar, typeArg: $typeVar){
+                            cashBalance
+                            creditBalance
                         }
-                        else {
-                            let serialized: IResponce = genericResponseMessage(500, 'Not suficient money!', global.counter, {})
-                            sendResponse(this.res, serialized)
-                            return
-                        }
-                    } else if (body.type == 'credit') {
-                        if (data.users[i].bankAccount.creditBalance >= body.amount) {
-                            data.users[i].bankAccount.creditBalance -= body.amount
-                        }
-                        else {
-                            let serialized: IResponce = genericResponseMessage(500, 'Not suficient money!', global.counter, {})
-                            sendResponse(this.res, serialized)
-                            return
-                        }
+                      }`,
+                    variables: {
+                        usernameVar: body.name,
+                        amountVar: body.amount,
+                        typeVar: body.type
                     }
-                    flag = true
-                    let serialized: IResponce = genericResponseMessage(200, 'Withdraw Done successfull', global.counter, data.users[i].bankAccount)
-                    sendResponse(this.res, serialized)
-                    break
-                }
-            }
+                }),
+            }).then(res => res.json())
 
-            if (!flag) {
-                let serialized: IResponce = genericResponseMessage(500, 'User Not found!', global.counter, {})
+            if (fetched.data === null) {
+                let serialized: IResponce = genericResponseMessage(500, 'User Not found, or Not suficient money or Payment method is incorrect', global.counter, {})
+                sendResponse(this.res, serialized)
+            } else {
+                let serialized: IResponce = genericResponseMessage(200, 'Withdraw Done successfull', global.counter, fetched)
                 sendResponse(this.res, serialized)
             }
         } catch (err: any) {
@@ -172,7 +187,7 @@ export class PurchaseHandler extends BaseHandler {
         this.res = res
     }
 
-    post(): void {
+    async post() {
         global.counter++
 
         try {
@@ -180,56 +195,32 @@ export class PurchaseHandler extends BaseHandler {
             isLargeFile(body.toString())
             isCorrectFields(body, 'productName', 'username', 'type')
 
-            let theProduct: IProduct = { name: '', price: 0 }
-            let flag = false
-            for (let i = 0; i < data.products.length; i++) {
-                if (data.products[i].name == body.productName) {
-                    theProduct = data.products[i]
-                    flag = true
-                    break
-                }
-            }
-
-            if (!flag) {
-                let serialized: IResponce = genericResponseMessage(500, 'Product Not found!', global.counter, {})
-                sendResponse(this.res, serialized)
-            }
-
-            let flag2 = false
-            for (let i = 0; i < data.users.length; i++) {
-                if (data.users[i].name == body.username) {
-                    if (body.type == 'cash') {
-                        if (data.users[i].bankAccount.cashBalance >= theProduct.price) {
-                            data.users[i].bankAccount.cashBalance -= theProduct.price
+            // purchase using graphQL
+            let fetched = await fetch(`http://localhost:${port}/graphql`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    query: `mutation{
+                        purchase(usernameArg: $usernameVar, productNameArg: $amountVar, typeArg: $typeVar){
+                            cashBalance
+                            creditBalance
                         }
-                        else {
-                            let serialized: IResponce = genericResponseMessage(500, 'Not suficient money!', global.counter, {})
-                            sendResponse(this.res, serialized)
-                            return
-                        }
-                    } else if (body.type == 'credit') {
-                        if (data.users[i].bankAccount.creditBalance >= theProduct.price) {
-                            data.users[i].bankAccount.creditBalance -= theProduct.price
-                        }
-                        else {
-                            let serialized: IResponce = genericResponseMessage(500, 'Not suficient money!', global.counter, {})
-                            sendResponse(this.res, serialized)
-                            return
-                        }
-                    } else {
-                        let serialized: IResponce = genericResponseMessage(500, 'Payment method not correct, Please enter "cash" or "credit"', global.counter, {})
-                        sendResponse(this.res, serialized)
-                        return
+                      }`,
+                    variables: {
+                        usernameVar: body.name,
+                        amountVar: body.amount,
+                        typeVar: body.type
                     }
-                    flag2 = true
-                    let serialized: IResponce = genericResponseMessage(200, `Payment succeded, you purchased a ${theProduct.price}`, global.counter, data.users[i].bankAccount)
-                    sendResponse(this.res, serialized)
-                    break
-                }
-            }
+                }),
+            }).then(res => res.json())
 
-            if (!flag2) {
-                let serialized: IResponce = genericResponseMessage(500, 'User Not found!', global.counter, {})
+            if (fetched.data === null) {
+                let serialized: IResponce = genericResponseMessage(500, 'Product Not found, or Not suficient money, or User nit found or Payment method is incorrect', global.counter, {})
+                sendResponse(this.res, serialized)
+            } else {
+                let serialized: IResponce = genericResponseMessage(200, `Purchase succeded`, global.counter, fetched)
                 sendResponse(this.res, serialized)
             }
         } catch (err: any) {
