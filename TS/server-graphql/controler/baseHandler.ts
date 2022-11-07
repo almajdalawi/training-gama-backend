@@ -3,11 +3,11 @@ import { IBaseHandler } from '../interfaces/app-interfaces'
 
 export abstract class BaseHandler implements IBaseHandler {
 
-    abstract get(): void
+    abstract get(_: any, args: object): any
 
-    abstract post(): void
+    abstract post(_: any, args: object): any
 
-    abstract delete(): void
+    abstract delete(_: any, args: object): any
 
-    abstract patch(): void
+    abstract patch(_: any, args: object): any
 }

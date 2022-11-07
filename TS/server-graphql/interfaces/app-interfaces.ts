@@ -27,10 +27,10 @@ export interface IResponce {
 }
 
 export interface IBaseHandler {
-    get: () => void
-    post: () => void
-    delete: () => void
-    patch: () => void
+    get: (_: any, args: object) => any
+    post: (_: any, args: object) => any
+    delete: (_: any, args: object) => any
+    patch: (_: any, args: object) => any
 
 }
 

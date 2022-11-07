@@ -1,60 +1,21 @@
-import * as dotenv from 'dotenv'
-import { Request, Response } from 'express';
 import { BaseHandler } from './baseHandler'
-import { genericResponseMessage } from '../utils/responseSerializer'
-import { IResponce } from '../interfaces/app-interfaces'
-import { isLargeFile } from '../utils/isLargFile'
-import { isCorrectFields } from '../utils/isCorrectFields'
-import { sendResponse } from '../utils/sendResponse';
+import { data } from '../data'
+import { IUser, IProduct } from '../interfaces/app-interfaces'
 
-dotenv.config()
-const port: string = process.env.PORT ? process.env.PORT.toString() : '0'
+
 
 export class BankDetailsHandler extends BaseHandler {
-    constructor(private req: Request, private res: Response) {
+    constructor() {
         super()
-        this.req = req
-        this.res = res
     }
 
-    async get() {
+    async get(_: any, { usernameArg }: { usernameArg: string }) {
         global.counter++
 
-        try {
-            let body = this.req.body
-            isLargeFile(body.toString())
-            isCorrectFields(body, 'name')
+        let theUser: IUser = data.users.find((user: IUser) => user.name == usernameArg)
+        if (!theUser) { throw new Error('User not found') }
 
-            // get bank details using graphQL
-            let fetched = await fetch(`http://localhost:${port}/graphql`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    query: `query{
-                        getBankDetails(usernameArg: $usernameVar){
-                          cashBalance
-                          creditBalance
-                        }
-                      }`,
-                    variables: {
-                        usernameVar: body.name,
-                    }
-                }),
-            }).then(res => res.json())
-
-            if (fetched.data === null) {
-                let serialized: IResponce = genericResponseMessage(200, 'User Not found!', global.counter, {})
-                sendResponse(this.res, serialized)
-            } else {
-                let serialized: IResponce = genericResponseMessage(200, 'Bank details fetched successfull', global.counter, fetched)
-                sendResponse(this.res, serialized)
-            }
-        } catch (err: any) {
-            let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
-            sendResponse(this.res, serialized)
-        }
+        return theUser.bankAccount
     }
 
     post(): void { }
@@ -66,53 +27,23 @@ export class BankDetailsHandler extends BaseHandler {
 
 
 export class DepositHandler extends BaseHandler {
-    constructor(private req: Request, private res: Response) {
+    constructor() {
         super()
-        this.req = req
-        this.res = res
     }
 
-    async post() {
+    async post(_: any, { usernameArg, amountArg, typeArg }: { usernameArg: string, amountArg: number, typeArg: string }) {
         global.counter++
 
-        try {
-            let body = this.req.body
-            isLargeFile(body.toString())
-            isCorrectFields(body, 'name', 'amount', 'type')
+        let theUser: IUser = data.users.find((user: IUser) => user.name == usernameArg)
+        if (!theUser) { throw new Error('User not found') }
 
+        if (typeArg != 'cash' && typeArg != 'credit') { throw new Error('Invalid payment type') }
 
-            // deposit using graphQL
-            let fetched = await fetch(`http://localhost:${port}/graphql`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    query: `mutation{
-                        deposit(usernameArg: $usernameVar, amountArg: $amountVar, typeArg: $typeVar){
-                            cashBalance
-                            creditBalance
-                        }
-                      }`,
-                    variables: {
-                        usernameVar: body.name,
-                        amountVar: body.amount,
-                        typeVar: body.type
-                    }
-                }),
-            }).then(res => res.json())
+        if (typeArg == 'cash') { theUser.bankAccount.cashBalance += amountArg }
+        else if (typeArg == 'credit') { theUser.bankAccount.creditBalance += amountArg }
+        else { throw new Error('Invalid payment type') }
 
-            if (fetched.data === null) {
-                let serialized: IResponce = genericResponseMessage(200, 'User Not found or Payment method is incorrect', global.counter, {})
-                sendResponse(this.res, serialized)
-            } else {
-                let serialized: IResponce = genericResponseMessage(200, 'Deposit Done successfull', global.counter, fetched)
-                sendResponse(this.res, serialized)
-            }
-        } catch (err: any) {
-            let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
-            sendResponse(this.res, serialized)
-        }
+        return theUser.bankAccount
     }
 
     get(): void { }
@@ -124,52 +55,25 @@ export class DepositHandler extends BaseHandler {
 
 
 export class WithdrawHandler extends BaseHandler {
-    constructor(private req: Request, private res: Response) {
+    constructor() {
         super()
-        this.req = req
-        this.res = res
     }
 
-    async post() {
+    async post(_: any, { usernameArg, amountArg, typeArg }: { usernameArg: string, amountArg: number, typeArg: string }) {
         global.counter++
 
-        try {
-            let body = this.req.body
-            isLargeFile(body.toString())
-            isCorrectFields(body, 'name', 'amount', 'type')
+        let theUser: IUser = data.users.find((user: IUser) => user.name == usernameArg)
+        if (!theUser) { throw new Error('User not found') }
 
-            // withdraw using graphQL
-            let fetched = await fetch(`http://localhost:${port}/graphql`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    query: `mutation{
-                        withdraw(usernameArg: $usernameVar, amountArg: $amountVar, typeArg: $typeVar){
-                            cashBalance
-                            creditBalance
-                        }
-                      }`,
-                    variables: {
-                        usernameVar: body.name,
-                        amountVar: body.amount,
-                        typeVar: body.type
-                    }
-                }),
-            }).then(res => res.json())
+        console.log(typeArg);
 
-            if (fetched.data === null) {
-                let serialized: IResponce = genericResponseMessage(500, 'User Not found, or Not suficient money or Payment method is incorrect', global.counter, {})
-                sendResponse(this.res, serialized)
-            } else {
-                let serialized: IResponce = genericResponseMessage(200, 'Withdraw Done successfull', global.counter, fetched)
-                sendResponse(this.res, serialized)
-            }
-        } catch (err: any) {
-            let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
-            sendResponse(this.res, serialized)
-        }
+        if (typeArg != 'cash' && typeArg != 'credit') { throw new Error('Invalid payment type') }
+
+        if (typeArg == 'cash' && amountArg <= theUser.bankAccount.cashBalance) { theUser.bankAccount.cashBalance -= amountArg }
+        else if (typeArg == 'credit' && amountArg <= theUser.bankAccount.creditBalance) { theUser.bankAccount.creditBalance -= amountArg }
+        else { throw new Error('Insuficient money') }
+
+        return theUser.bankAccount
     }
 
     get(): void { }
@@ -181,52 +85,25 @@ export class WithdrawHandler extends BaseHandler {
 
 
 export class PurchaseHandler extends BaseHandler {
-    constructor(private req: Request, private res: Response) {
+    constructor() {
         super()
-        this.req = req
-        this.res = res
     }
 
-    async post() {
+    async post(_: any, { usernameArg, productNameArg, typeArg }: { usernameArg: string, productNameArg: string, typeArg: string }) {
         global.counter++
 
-        try {
-            let body = this.req.body
-            isLargeFile(body.toString())
-            isCorrectFields(body, 'productName', 'username', 'type')
+        let theUser: IUser = data.users.find((user: IUser) => user.name == usernameArg)
+        if (!theUser) { throw new Error('User not found') }
+        let theProduct: IProduct = data.products.find((product: IProduct) => product.name == productNameArg)
+        if (!theProduct) { throw new Error('Product not found') }
 
-            // purchase using graphQL
-            let fetched = await fetch(`http://localhost:${port}/graphql`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    query: `mutation{
-                        purchase(usernameArg: $usernameVar, productNameArg: $amountVar, typeArg: $typeVar){
-                            cashBalance
-                            creditBalance
-                        }
-                      }`,
-                    variables: {
-                        usernameVar: body.name,
-                        amountVar: body.amount,
-                        typeVar: body.type
-                    }
-                }),
-            }).then(res => res.json())
+        if (typeArg != 'cash' && typeArg != 'credit') { throw new Error('Invalid payment type') }
 
-            if (fetched.data === null) {
-                let serialized: IResponce = genericResponseMessage(500, 'Product Not found, or Not suficient money, or User nit found or Payment method is incorrect', global.counter, {})
-                sendResponse(this.res, serialized)
-            } else {
-                let serialized: IResponce = genericResponseMessage(200, `Purchase succeded`, global.counter, fetched)
-                sendResponse(this.res, serialized)
-            }
-        } catch (err: any) {
-            let serialized: IResponce = genericResponseMessage(500, err.toString(), global.counter, {})
-            sendResponse(this.res, serialized)
-        }
+        if (typeArg == 'cash' && theProduct.price <= theUser.bankAccount.cashBalance) { theUser.bankAccount.cashBalance -= theProduct.price }
+        else if (typeArg == 'credit' && theProduct.price <= theUser.bankAccount.creditBalance) { theUser.bankAccount.creditBalance -= theProduct.price }
+        else { throw new Error('Insuficient money') }
+
+        return theUser.bankAccount
     }
 
     get(): void { }
