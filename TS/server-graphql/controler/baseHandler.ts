@@ -1,13 +1,13 @@
-import { IBaseHandler } from '../interfaces/app-interfaces'
+import { IBaseHandler, IGet, IGetRes, IPost, IPostRes, IDelete, IDeleteRes, IPatch, IPatchRes } from '../interfaces/app-interfaces'
 
 
 export abstract class BaseHandler implements IBaseHandler {
 
-    abstract get(_: any, args: object): any
+    abstract get(_: any, args: IGet): IGetRes
 
-    abstract post(_: any, args: object): any
+    abstract post(_: any, args: IPost): IPostRes
 
-    abstract delete(_: any, args: object): any
+    abstract delete(_: any, args: IDelete): IDeleteRes
 
-    abstract patch(_: any, args: object): any
+    abstract patch(_: any, args: IPatch): IPatchRes
 }

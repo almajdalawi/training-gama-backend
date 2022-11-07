@@ -9,39 +9,29 @@ export class ProductHandler extends BaseHandler {
         super()
     }
 
-    async get(_: any) {
-        global.counter++
-
+    async get(_: any): Promise<IProduct[]> {
         return data.products
     }
 
-    async post(_: any, { nameArg, priceArg }: { nameArg: string, priceArg: number }) {
-        global.counter++
-
-        let newProduct: IProduct = new Product(nameArg, priceArg)
+    async post(_: any, { name, price }: { name: string, price: number }): Promise<IProduct[]> {
+        let newProduct: IProduct = new Product(name, price)
         data.products.push(newProduct)
 
         return data.products
     }
 
-
-
-    async delete(_: any, { nameArg }: { nameArg: string }) {
-        global.counter++
-
-        let productIndex = data.products.findIndex((product: IProduct) => product.name === nameArg)
+    async delete(_: any, { name }: { name: string }): Promise<IProduct[]> {
+        let productIndex = data.products.findIndex((product: IProduct) => product.name === name)
         if (productIndex == -1) { throw new Error('Product not found') }
         data.products.splice(productIndex, 1)
 
         return data.products
     }
 
-    async patch(_: any, { nameArg, priceArg }: { nameArg: string, priceArg: number }) {
-        global.counter++
-
-        let productIndex = data.products.findIndex((product: IProduct) => product.name === nameArg)
+    async patch(_: any, { name, price }: { name: string, price: number }): Promise<IProduct[]> {
+        let productIndex = data.products.findIndex((product: IProduct) => product.name === name)
         if (productIndex == -1) { throw new Error('Product not found') }
-        data.products[productIndex].price = priceArg
+        data.products[productIndex].price = price
 
         return data.products
     }

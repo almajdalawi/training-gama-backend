@@ -10,25 +10,19 @@ export class UserHandler extends BaseHandler {
         super()
     }
 
-    async get(_: any) {
-        global.counter++
-
+    async get(_: any): Promise<IUser[]> {
         return data.users
     }
 
-    async post(_: any, { nameArg }: { nameArg: string }) {
-        global.counter++
-
-        let newUser: IUser = new User(nameArg)
+    async post(_: any, { name }: { name: string }): Promise<IUser[]> {
+        let newUser: IUser = new User(name)
         data.users.push(newUser)
 
         return data.users
     }
 
-    async delete(_: any, { nameArg }: { nameArg: string }) {
-        global.counter++
-
-        let userIndex = data.users.findIndex((user: IUser) => user.name === nameArg)
+    async delete(_: any, { name }: { name: string }): Promise<IUser[]> {
+        let userIndex = data.users.findIndex((user: IUser) => user.name === name)
         if (userIndex == -1) { throw new Error('User not found') }
         data.users.splice(userIndex, 1)
 

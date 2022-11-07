@@ -1,6 +1,6 @@
 import { BaseHandler } from './baseHandler'
 import { data } from '../data'
-import { IUser, IProduct } from '../interfaces/app-interfaces'
+import { IUser, IProduct, IBank } from '../interfaces/app-interfaces'
 
 
 
@@ -9,10 +9,8 @@ export class BankDetailsHandler extends BaseHandler {
         super()
     }
 
-    async get(_: any, { usernameArg }: { usernameArg: string }) {
-        global.counter++
-
-        let theUser: IUser = data.users.find((user: IUser) => user.name == usernameArg)
+    async get(_: any, { username }: { username: string }): Promise<IBank> {
+        let theUser: IUser = data.users.find((user: IUser) => user.name == username)
         if (!theUser) { throw new Error('User not found') }
 
         return theUser.bankAccount
@@ -31,16 +29,14 @@ export class DepositHandler extends BaseHandler {
         super()
     }
 
-    async post(_: any, { usernameArg, amountArg, typeArg }: { usernameArg: string, amountArg: number, typeArg: string }) {
-        global.counter++
-
-        let theUser: IUser = data.users.find((user: IUser) => user.name == usernameArg)
+    async post(_: any, { username, amount, type }: { username: string, amount: number, type: string }): Promise<IBank> {
+        let theUser: IUser = data.users.find((user: IUser) => user.name == username)
         if (!theUser) { throw new Error('User not found') }
 
-        if (typeArg != 'cash' && typeArg != 'credit') { throw new Error('Invalid payment type') }
+        if (type != 'cash' && type != 'credit') { throw new Error('Invalid payment type') }
 
-        if (typeArg == 'cash') { theUser.bankAccount.cashBalance += amountArg }
-        else if (typeArg == 'credit') { theUser.bankAccount.creditBalance += amountArg }
+        if (type == 'cash') { theUser.bankAccount.cashBalance += amount }
+        else if (type == 'credit') { theUser.bankAccount.creditBalance += amount }
         else { throw new Error('Invalid payment type') }
 
         return theUser.bankAccount
@@ -59,18 +55,16 @@ export class WithdrawHandler extends BaseHandler {
         super()
     }
 
-    async post(_: any, { usernameArg, amountArg, typeArg }: { usernameArg: string, amountArg: number, typeArg: string }) {
-        global.counter++
-
-        let theUser: IUser = data.users.find((user: IUser) => user.name == usernameArg)
+    async post(_: any, { username, amount, type }: { username: string, amount: number, type: string }): Promise<IBank> {
+        let theUser: IUser = data.users.find((user: IUser) => user.name == username)
         if (!theUser) { throw new Error('User not found') }
 
-        console.log(typeArg);
+        console.log(type);
 
-        if (typeArg != 'cash' && typeArg != 'credit') { throw new Error('Invalid payment type') }
+        if (type != 'cash' && type != 'credit') { throw new Error('Invalid payment type') }
 
-        if (typeArg == 'cash' && amountArg <= theUser.bankAccount.cashBalance) { theUser.bankAccount.cashBalance -= amountArg }
-        else if (typeArg == 'credit' && amountArg <= theUser.bankAccount.creditBalance) { theUser.bankAccount.creditBalance -= amountArg }
+        if (type == 'cash' && amount <= theUser.bankAccount.cashBalance) { theUser.bankAccount.cashBalance -= amount }
+        else if (type == 'credit' && amount <= theUser.bankAccount.creditBalance) { theUser.bankAccount.creditBalance -= amount }
         else { throw new Error('Insuficient money') }
 
         return theUser.bankAccount
@@ -89,18 +83,16 @@ export class PurchaseHandler extends BaseHandler {
         super()
     }
 
-    async post(_: any, { usernameArg, productNameArg, typeArg }: { usernameArg: string, productNameArg: string, typeArg: string }) {
-        global.counter++
-
-        let theUser: IUser = data.users.find((user: IUser) => user.name == usernameArg)
+    async post(_: any, { username, productName, type }: { username: string, productName: string, type: string }): Promise<IBank> {
+        let theUser: IUser = data.users.find((user: IUser) => user.name == username)
         if (!theUser) { throw new Error('User not found') }
-        let theProduct: IProduct = data.products.find((product: IProduct) => product.name == productNameArg)
+        let theProduct: IProduct = data.products.find((product: IProduct) => product.name == productName)
         if (!theProduct) { throw new Error('Product not found') }
 
-        if (typeArg != 'cash' && typeArg != 'credit') { throw new Error('Invalid payment type') }
+        if (type != 'cash' && type != 'credit') { throw new Error('Invalid payment type') }
 
-        if (typeArg == 'cash' && theProduct.price <= theUser.bankAccount.cashBalance) { theUser.bankAccount.cashBalance -= theProduct.price }
-        else if (typeArg == 'credit' && theProduct.price <= theUser.bankAccount.creditBalance) { theUser.bankAccount.creditBalance -= theProduct.price }
+        if (type == 'cash' && theProduct.price <= theUser.bankAccount.cashBalance) { theUser.bankAccount.cashBalance -= theProduct.price }
+        else if (type == 'credit' && theProduct.price <= theUser.bankAccount.creditBalance) { theUser.bankAccount.creditBalance -= theProduct.price }
         else { throw new Error('Insuficient money') }
 
         return theUser.bankAccount

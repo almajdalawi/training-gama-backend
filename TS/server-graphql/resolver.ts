@@ -3,6 +3,7 @@ import { gql } from "apollo-server-express"
 import { ProductHandler } from "./controler/product"
 import { UserHandler } from "./controler/user"
 import { BankDetailsHandler, DepositHandler, WithdrawHandler, PurchaseHandler } from "./controler/bank"
+import { IResolvers } from "./interfaces/app-interfaces"
 
 
 // export const schema = buildSchema(`
@@ -27,23 +28,23 @@ type User {
 type Query {
     getProducts: [Product]
     getUsers: [User]
-    getBankDetails(usernameArg: String!): BankAccount
+    getBankDetails(username: String!): BankAccount
 }
 
 type Mutation {
-    createProduct(nameArg: String!, priceArg: Int!): [Product]
-    deleteProduct(nameArg: String!): [Product]
-    updateProduct(nameArg: String!, priceArg: Int!): [Product]
-    createUser(nameArg: String!): [User]
-    deleteUser(nameArg: String!): [User]
-    deposit(usernameArg: String!, amountArg: Int!, typeArg: String!): BankAccount
-    withdraw(usernameArg: String!, amountArg: Int!, typeArg: String!): BankAccount
-    purchase(usernameArg: String!, productNameArg: String!, typeArg: String!): BankAccount
+    createProduct(name: String!, price: Int!): [Product]
+    deleteProduct(name: String!): [Product]
+    updateProduct(name: String!, price: Int!): [Product]
+    createUser(name: String!): [User]
+    deleteUser(name: String!): [User]
+    deposit(username: String!, amount: Int!, type: String!): BankAccount
+    withdraw(username: String!, amount: Int!, type: String!): BankAccount
+    purchase(username: String!, productName: String!, type: String!): BankAccount
 }
 `
 // )
 
-export const resolvers = {
+export const resolvers: IResolvers = {
     Query: {       // added only for Apollo
         getProducts: new ProductHandler().get,
         getUsers: new UserHandler().get,
