@@ -3,26 +3,29 @@ export interface IProduct {
     price: number
 }
 
-export interface IBank {
-    accountId: number,
-    cashBalance: number,
-    creditBalance: number
-}
-
 export interface IUser {
     userId: number,
     name: string,
     bankAccount: IBank
 }
 
+export interface IBank {
+    accountId: number,
+    cashBalance: number,
+    creditBalance: number
+}
+
+
+//////////////////////
+
 export interface IResolvers {
     Query?: Object,
     Mutation?: Object
 }
 
-export interface IGetBankDetails {
-    username: string
-}
+
+//////////////////////
+
 
 export interface IPostProduct {
     name: string,
@@ -31,6 +34,10 @@ export interface IPostProduct {
 
 export interface IPostUser {
     name: string
+}
+
+export interface IGetBankDetails {
+    username: string
 }
 
 export interface IPostBankTransaction {
@@ -44,7 +51,6 @@ export interface IPurchase {
     productName: string,
     type: string
 }
-
 
 export interface IDeleteProduct {
     name: string

@@ -1,8 +1,8 @@
 import { GraphQLError } from 'graphql';
 import { BaseHandler } from './BaseHandler'
-import { User } from '../../payment-typescript/payment'
 import { data } from '../data'
 import { IUser } from '../shared/interfaces'
+import { User } from '../../payment-typescript/payment'
 
 
 

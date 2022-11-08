@@ -1,7 +1,7 @@
 // import { buildSchema } from 'graphql'
 import { gql } from "apollo-server-express"
-import { UserHandler } from "../controler/UserHandler"
 import { IResolvers } from "../shared/interfaces"
+import { UserHandler } from "../controler/UserHandler"
 
 
 // export const schema = buildSchema(`
@@ -14,9 +14,9 @@ type BankAccount {
 }
 
 type User {
-    userId: Int!
-    name: String!
     bankAccount: BankAccount!
+    name: String!
+    userId: Int!
 }
 
 type Query {

@@ -1,8 +1,8 @@
 import { GraphQLError } from 'graphql';
 import { BaseHandler } from './BaseHandler'
-import { Product } from '../../payment-typescript/payment'
 import { data } from '../data'
 import { IProduct } from '../shared/interfaces'
+import { Product } from '../../payment-typescript/payment'
 
 
 export class ProductHandler extends BaseHandler {

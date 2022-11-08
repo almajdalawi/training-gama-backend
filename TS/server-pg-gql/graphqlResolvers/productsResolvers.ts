@@ -1,7 +1,7 @@
 // import { buildSchema } from 'graphql'
 import { gql } from "apollo-server-express"
-import { ProductHandler } from "../controler/ProductHandler"
 import { IResolvers } from "../shared/interfaces"
+import { ProductHandler } from "../controler/ProductHandler"
 
 
 // export const schema = buildSchema(`

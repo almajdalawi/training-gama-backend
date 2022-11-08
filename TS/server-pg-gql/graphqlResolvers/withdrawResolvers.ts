@@ -1,7 +1,7 @@
 // import { buildSchema } from 'graphql'
 import { gql } from "apollo-server-express"
-import { WithdrawHandler } from "../controler/WithdrawHandler"
 import { IResolvers } from "../shared/interfaces"
+import { WithdrawHandler } from "../controler/WithdrawHandler"
 
 
 // export const schema = buildSchema(`
