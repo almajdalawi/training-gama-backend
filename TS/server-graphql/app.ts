@@ -2,7 +2,12 @@ import * as dotenv from 'dotenv'
 import express from 'express'
 import { Express, Request, Response } from 'express';
 import { ApolloServer, ExpressContext } from "apollo-server-express";
-import { schema, resolvers } from './graphqlResolvers/resolvers'
+import { purchaseSchema, purchaseResolvers } from './graphqlResolvers/purchaseResolvers'
+import { bankDetailsSchema, bankDetailsResolvers } from './graphqlResolvers/bankDetailsResolvers'
+import { depositSchema, depositResolvers } from './graphqlResolvers/depositResolvers'
+import { withdrawSchema, withdrawResolvers } from './graphqlResolvers/withdrawResolvers'
+import { productsSchema, productsResolvers } from './graphqlResolvers/productsResolvers'
+import { usersSchema, usersResolvers } from './graphqlResolvers/usersResolvers'
 
 dotenv.config()
 
@@ -24,10 +29,10 @@ function serverErrorHndler(error: Error, req: Request, res: Response): Response 
 
 
 
-async function startApolloServer(schema: any, resolvers: any): Promise<void> {
+async function startApolloServer(schemas: any[], resolvers: any[]): Promise<void> {
     const server: ApolloServer<ExpressContext> = new ApolloServer({
-        typeDefs: schema,
-        resolvers: resolvers,
+        typeDefs: schemas,
+        resolvers: resolvers
     })
     await server.start();
     server.applyMiddleware({ app });
@@ -42,4 +47,6 @@ async function startApolloServer(schema: any, resolvers: any): Promise<void> {
     console.log(`Server ready at http://localhost:${port + server.graphqlPath}`);
 }
 
-startApolloServer(schema, resolvers);
+const schemas: any[] = [productsSchema, usersSchema, bankDetailsSchema, depositSchema, withdrawSchema, purchaseSchema]
+const resolvers: any[] = [productsResolvers, usersResolvers, bankDetailsResolvers, depositResolvers, withdrawResolvers, purchaseResolvers]
+startApolloServer(schemas, resolvers);

@@ -16,8 +16,8 @@ export interface IUser {
 }
 
 export interface IResolvers {
-    Query: Object,
-    Mutation: Object
+    Query?: Object,
+    Mutation?: Object
 }
 
 export interface IGetBankDetails {
