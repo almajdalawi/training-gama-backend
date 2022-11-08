@@ -11,7 +11,7 @@
     "start-node": "tsc -t es5 --resolveJsonModule --esModuleInterop --outDir build server-nodeJs/app.ts &&  node build/server-nodeJs/app.js",
     "start-express": "tsc -t es5 --resolveJsonModule --esModuleInterop --outDir build server-express/app.ts &&  node build/server-express/app.js",
     "start-gql": "tsc -t es5 --resolveJsonModule --esModuleInterop --outDir build server-graphql/app.ts &&  node --trace-warnings build/server-graphql/app.js",
-    "start": "tsc -t es5 --resolveJsonModule --esModuleInterop --outDir build server-graphql/app.ts &&  node --trace-warnings build/server-ps-gql/app.js"
+    "start": "tsc -t es5 --resolveJsonModule --esModuleInterop --outDir build server-pg-gql/app.ts &&  node --trace-warnings build/server-pg-gql/app.js"
   },
   "repository": {
     "type": "git",

@@ -1,19 +1,18 @@
 import * as dotenv from 'dotenv'
 import express from 'express'
-import { Express, Request, Response } from 'express';
 import { ApolloServer, ExpressContext } from "apollo-server-express";
-import { purchaseSchema, purchaseResolvers } from './graphqlResolvers/purchaseResolvers'
 import { bankDetailsSchema, bankDetailsResolvers } from './graphqlResolvers/bankDetailsResolvers'
 import { depositSchema, depositResolvers } from './graphqlResolvers/depositResolvers'
-import { withdrawSchema, withdrawResolvers } from './graphqlResolvers/withdrawResolvers'
+import { Express, Request, Response } from 'express';
+import { getEnv } from './shared/getEnv'
 import { productsSchema, productsResolvers } from './graphqlResolvers/productsResolvers'
+import { purchaseSchema, purchaseResolvers } from './graphqlResolvers/purchaseResolvers'
 import { usersSchema, usersResolvers } from './graphqlResolvers/usersResolvers'
+import { withdrawSchema, withdrawResolvers } from './graphqlResolvers/withdrawResolvers'
+
 
 dotenv.config()
-
-const port: number = process.env.PORT ? parseInt(process.env.PORT) : 0
-
-global.counter = 0
+const port: number = getEnv(process.env.PORT, 4000);
 
 export const app: Express = express()
 
