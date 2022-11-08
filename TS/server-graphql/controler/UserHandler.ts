@@ -1,7 +1,8 @@
-import { BaseHandler } from './baseHandler'
+import { GraphQLError } from 'graphql';
+import { BaseHandler } from './BaseHandler'
 import { User } from '../../payment-typescript/payment'
 import { data } from '../data'
-import { IUser } from '../interfaces/app-interfaces'
+import { IUser } from '../shared/interfaces'
 
 
 
@@ -23,7 +24,7 @@ export class UserHandler extends BaseHandler {
 
     async delete(_: any, { name }: { name: string }): Promise<IUser[]> {
         let userIndex = data.users.findIndex((user: IUser) => user.name === name)
-        if (userIndex == -1) { throw new Error('User not found') }
+        if (userIndex == -1) { throw new GraphQLError('User not found') }
         data.users.splice(userIndex, 1)
 
         return data.users

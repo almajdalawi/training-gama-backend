@@ -1,7 +1,8 @@
-import { BaseHandler } from './baseHandler'
+import { GraphQLError } from 'graphql';
+import { BaseHandler } from './BaseHandler'
 import { Product } from '../../payment-typescript/payment'
 import { data } from '../data'
-import { IProduct } from '../interfaces/app-interfaces'
+import { IProduct } from '../shared/interfaces'
 
 
 export class ProductHandler extends BaseHandler {
@@ -22,7 +23,7 @@ export class ProductHandler extends BaseHandler {
 
     async delete(_: any, { name }: { name: string }): Promise<IProduct[]> {
         let productIndex = data.products.findIndex((product: IProduct) => product.name === name)
-        if (productIndex == -1) { throw new Error('Product not found') }
+        if (productIndex == -1) { throw new GraphQLError('Product not found') }
         data.products.splice(productIndex, 1)
 
         return data.products
@@ -30,7 +31,7 @@ export class ProductHandler extends BaseHandler {
 
     async patch(_: any, { name, price }: { name: string, price: number }): Promise<IProduct[]> {
         let productIndex = data.products.findIndex((product: IProduct) => product.name === name)
-        if (productIndex == -1) { throw new Error('Product not found') }
+        if (productIndex == -1) { throw new GraphQLError('Product not found') }
         data.products[productIndex].price = price
 
         return data.products

@@ -1,4 +1,4 @@
-import { IBaseHandler, IGet, IGetRes, IPost, IPostRes, IDelete, IDeleteRes, IPatch, IPatchRes } from '../interfaces/app-interfaces'
+import { IBaseHandler, IGet, IGetRes, IPost, IPostRes, IDelete, IDeleteRes, IPatch, IPatchRes } from '../shared/interfaces'
 
 
 export abstract class BaseHandler implements IBaseHandler {

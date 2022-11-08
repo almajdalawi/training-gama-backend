@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv'
 import express from 'express'
 import { Express, Request, Response } from 'express';
-import { ApolloServer } from "apollo-server-express";
-import { resolvers, schema } from './resolver'
+import { ApolloServer, ExpressContext } from "apollo-server-express";
+import { schema, resolvers } from './graphqlResolvers/resolvers'
 
 dotenv.config()
 
@@ -25,10 +25,10 @@ function serverErrorHndler(error: Error, req: Request, res: Response): Response 
 
 
 async function startApolloServer(schema: any, resolvers: any): Promise<void> {
-    const server = new ApolloServer({
+    const server: ApolloServer<ExpressContext> = new ApolloServer({
         typeDefs: schema,
         resolvers: resolvers,
-    }) as any;
+    })
     await server.start();
     server.applyMiddleware({ app });
 

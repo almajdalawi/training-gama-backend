@@ -1,9 +1,12 @@
 // import { buildSchema } from 'graphql'
 import { gql } from "apollo-server-express"
-import { ProductHandler } from "./controler/product"
-import { UserHandler } from "./controler/user"
-import { BankDetailsHandler, DepositHandler, WithdrawHandler, PurchaseHandler } from "./controler/bank"
-import { IResolvers } from "./interfaces/app-interfaces"
+import { ProductHandler } from "../controler/ProductHandler"
+import { UserHandler } from "../controler/UserHandler"
+import { BankDetailsHandler } from "../controler/BankDetailsHandler"
+import { DepositHandler } from "../controler/DepositHandler"
+import { WithdrawHandler } from "../controler/WithdrawHandler"
+import { PurchaseHandler } from "../controler/PurchaseHandler"
+import { IResolvers } from "../shared/interfaces"
 
 
 // export const schema = buildSchema(`
