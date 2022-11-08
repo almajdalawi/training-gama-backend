@@ -3,6 +3,7 @@ import bodyParser from 'body-parser'
 import express from 'express'
 import { Express, Request, Response } from 'express';
 import { HomeRoutes, ProducRoutes, UserRoutes, BankDetailsRoutes, DepositRoutes, WithdrawRoutes, PerchaseRoutes, OsRoutes } from './routes/routes';
+import { genericResponseMessage } from './utils/responseSerializer';
 
 dotenv.config()
 
@@ -26,14 +27,15 @@ Object.values(new OsRoutes(app).routes)
 
 
 function notFoundHndler(req: Request, res: Response) {
-    return res.status(404).send("Not Found!!");
+    let serialized = genericResponseMessage(404, 'Not Found', global.counter, {})
+
+    return res.status(404).send(serialized);
 }
+
 function serverErrorHndler(error: Error, req: Request, res: Response) {
-    let err = {
-        status: 500,
-        message: "Sorry, something went wrong"
-    }
-    return res.status(500).send(err);
+    let serialized = genericResponseMessage(500, 'Server error', global.counter, {})
+
+    return res.status(500).send(serialized);
 }
 
 

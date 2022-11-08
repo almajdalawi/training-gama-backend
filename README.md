@@ -2,7 +2,7 @@
 
 **Author:**  [Emad Almajdalawi](https://github.com/almajdalawi)
 
-**Date:** Oct,2022
+**Date:** 2022
 
 ## Overview
 
@@ -22,7 +22,7 @@ This repo is for practicing backend skills
 - [Payment OOP TS](TS/payment-typescript/README.md)
 - [Node.js Server](TS/server-nodeJs/README.md)
 - [Express Server](TS/server-express/README.md)
--
+- [GraphQL](TS/graphql/README.md)
 
 <br>
 

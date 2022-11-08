@@ -8,7 +8,9 @@
     "test": "jest --verbose --coverage",
     "lint": "tsc --noEmit --incremental && eslint . --ext .ts,.tsx,.js,.jsx",
     "lint-and-fix": "lint --fix",
-    "start": "tsc -t es5 --resolveJsonModule --esModuleInterop --outDir build server-express/app.ts &&  node build/server-express/app.js"
+    "start-node": "tsc -t es5 --resolveJsonModule --esModuleInterop --outDir build server-nodeJs/app.ts &&  node build/server-nodeJs/app.js",
+    "start-express": "tsc -t es5 --resolveJsonModule --esModuleInterop --outDir build server-express/app.ts &&  node build/server-express/app.js",
+    "start": "tsc -t es5 --resolveJsonModule --esModuleInterop --outDir build server-graphql/app.ts &&  node --trace-warnings build/server-graphql/app.js"
   },
   "repository": {
     "type": "git",
@@ -21,9 +23,13 @@
   },
   "homepage": "https://github.com/almajdalawi/training-gama-backend#readme/TS",
   "dependencies": {
+    "apollo-server-core": "^3.11.1",
+    "apollo-server-express": "^3.11.1",
     "body-parser": "^1.20.1",
     "dotenv": "^16.0.3",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "express-graphql": "^0.12.0",
+    "graphql": "^16.6.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.19.6",
