@@ -1,7 +1,11 @@
+import * as dotenv from 'dotenv'
 
-export function getEnv(envName: string | undefined, fallback: number): number {
-    if (envName) {
-        return parseInt(envName)
+dotenv.config()
+
+export function getEnv(envName: string, fallback: string | number): any {
+    const env = process.env[envName]
+    if (env) {
+        return env
     } else {
         return fallback
     }
