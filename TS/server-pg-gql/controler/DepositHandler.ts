@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql';
 import { BaseHandler } from './BaseHandler'
-import { data } from '../data'
+import { db } from '../app'
 import { IUser, IBank } from '../shared/interfaces'
 
 
@@ -11,7 +11,7 @@ export class DepositHandler extends BaseHandler {
     }
 
     async post(_: any, { username, amount, type }: { username: string, amount: number, type: string }): Promise<IBank> {
-        let theUser: IUser = data.users.find((user: IUser) => user.name == username)
+        let theUser: IUser = db.users.findOne((user: IUser) => user.name == username)
         if (!theUser) { throw new GraphQLError('User not found') }
 
         if (type != 'cash' && type != 'credit') { throw new GraphQLError('Invalid payment type') }

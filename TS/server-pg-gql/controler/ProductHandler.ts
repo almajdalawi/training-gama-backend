@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql';
 import { BaseHandler } from './BaseHandler'
-import { data } from '../data'
+import { db } from '../app'
 import { IProduct } from '../shared/interfaces'
 import { Product } from '../../payment-typescript/payment'
 
@@ -11,29 +11,29 @@ export class ProductHandler extends BaseHandler {
     }
 
     async get(_: any): Promise<IProduct[]> {
-        return data.products
+        return db.products.findAll()
     }
 
     async post(_: any, { name, price }: { name: string, price: number }): Promise<IProduct[]> {
         let newProduct: IProduct = new Product(name, price)
-        data.products.push(newProduct)
+        db.products.create(newProduct)
 
-        return data.products
+        return db.products.findAll()
     }
 
     async delete(_: any, { name }: { name: string }): Promise<IProduct[]> {
-        let productIndex = data.products.findIndex((product: IProduct) => product.name === name)
+        let productIndex = await db.products.findOne({ where: { name: name } })
         if (productIndex == -1) { throw new GraphQLError('Product not found') }
-        data.products.splice(productIndex, 1)
+        db.products.destroy({ where: { name: name } })
 
-        return data.products
+        return db.products.findAll()
     }
 
     async patch(_: any, { name, price }: { name: string, price: number }): Promise<IProduct[]> {
-        let productIndex = data.products.findIndex((product: IProduct) => product.name === name)
+        let productIndex = await db.products.findOne({ where: { name: name } })
         if (productIndex == -1) { throw new GraphQLError('Product not found') }
-        data.products[productIndex].price = price
+        db.products.update({ price: price }, { where: { name: name } })
 
-        return data.products
+        return db.products.findAll()
     }
 }
