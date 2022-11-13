@@ -10,7 +10,8 @@ import { purchaseSchema, purchaseResolvers } from './graphqlResolvers/purchaseRe
 import { usersSchema, usersResolvers } from './graphqlResolvers/usersResolvers'
 import { withdrawSchema, withdrawResolvers } from './graphqlResolvers/withdrawResolvers'
 import { Sequelize } from 'sequelize';
-import { dbCreateTables } from './db/models';
+// import { dbAlterTables, UserModel, ProductModel, BankDetailsModel } from './db/models';
+import { DataTypes } from 'sequelize';
 
 
 const port: number = parseInt(getEnv('PORT', 4000))
@@ -47,7 +48,77 @@ export const db = new Sequelize(dbCredentials.database, dbCredentials.user, dbCr
 });
 
 
-dbCreateTables()
+
+
+
+export const ProductModel = db.define('product', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    price: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    }
+},
+    {
+        timestamps: false,
+    }
+);
+
+export const UserModel = db.define('user', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    bankAccountId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    }
+},
+    {
+        timestamps: false,
+    }
+);
+
+export const BankDetailsModel = db.define('bankDetails', {
+    accountId: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    cashBalance: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+    },
+    creditBalance: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+    }
+},
+    {
+        timestamps: false,
+    }
+);
+
+
+UserModel.belongsTo(BankDetailsModel, { foreignKey: 'bankAccountId' });
+
+db.sync({ alter: true }).then(() => {
+    console.log('Database & tables created!');
+});
 
 
 

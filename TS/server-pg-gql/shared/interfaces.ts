@@ -74,10 +74,10 @@ export type IPost = IPostProduct | IPostUser | IPostBankTransaction | IPurchase
 export type IDelete = IDeleteProduct | IDeleteUser
 export type IPatch = IPatchProduct
 
-export type IGetRes = Promise<IProduct[]> | Promise<IUser[]> | Promise<IBank> | Promise<Model<any, any>[]> | Model<any, any> | Promise<Model<any, any>> | void
-export type IPostRes = Promise<IProduct[]> | Promise<IUser[]> | Promise<IBank> | Promise<Model<any, any>[]> | Model<any, any> | Promise<Model<any, any>> | void
-export type IDeleteRes = Promise<IProduct[]> | Promise<IUser[]> | Promise<Model<any, any>[]> | Model<any, any> | Promise<Model<any, any>> | void
-export type IPatchRes = Promise<IProduct[]> | Promise<IUser[]> | Promise<Model<any, any>[]> | Model<any, any> | Promise<Model<any, any>> | void
+export type IGetRes = Promise<IProduct[]> | Promise<IUser[]> | Promise<IBank> | IProduct[] | Promise<IUser> | void
+export type IPostRes = Promise<IProduct[]> | Promise<IUser[]> | Promise<IBank> | Promise<IUser> | void
+export type IDeleteRes = Promise<IProduct[]> | Promise<IUser[]> | Promise<IUser> | void
+export type IPatchRes = Promise<IProduct[]> | Promise<IUser[]> | Promise<IUser> | void
 
 
 export interface IBaseHandler {
