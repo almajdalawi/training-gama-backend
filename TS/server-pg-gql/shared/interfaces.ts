@@ -1,9 +1,13 @@
+import { Model } from "sequelize";
+
 export interface IProduct {
+    id: number;
     name: string,
     price: number
 }
 
 export interface IUser {
+    id: number;
     userId: number,
     name: string,
     bankAccount: IBank
@@ -70,10 +74,10 @@ export type IPost = IPostProduct | IPostUser | IPostBankTransaction | IPurchase
 export type IDelete = IDeleteProduct | IDeleteUser
 export type IPatch = IPatchProduct
 
-export type IGetRes = Promise<IProduct[]> | Promise<IUser[]> | Promise<IBank> | void
-export type IPostRes = Promise<IProduct[]> | Promise<IUser[]> | Promise<IBank> | void
-export type IDeleteRes = Promise<IProduct[]> | Promise<IUser[]> | void
-export type IPatchRes = Promise<IProduct[]> | Promise<IUser[]> | void
+export type IGetRes = Promise<IProduct[]> | Promise<IUser[]> | Promise<IBank> | Promise<Model<any, any>[]> | Model<any, any> | Promise<Model<any, any>> | void
+export type IPostRes = Promise<IProduct[]> | Promise<IUser[]> | Promise<IBank> | Promise<Model<any, any>[]> | Model<any, any> | Promise<Model<any, any>> | void
+export type IDeleteRes = Promise<IProduct[]> | Promise<IUser[]> | Promise<Model<any, any>[]> | Model<any, any> | Promise<Model<any, any>> | void
+export type IPatchRes = Promise<IProduct[]> | Promise<IUser[]> | Promise<Model<any, any>[]> | Model<any, any> | Promise<Model<any, any>> | void
 
 
 export interface IBaseHandler {

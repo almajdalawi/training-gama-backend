@@ -1,6 +1,10 @@
+// import { User } from 'payment-typescript/payment';
 import { DataTypes } from 'sequelize';
 import { db } from '../app';
 
+
+console.log('***********************************')
+console.log(db)
 
 export function dbCreateTables(): void {
     const ProductModel = db.define('product', {
@@ -29,32 +33,33 @@ export function dbCreateTables(): void {
             type: DataTypes.STRING,
             allowNull: false
         },
-        bank_account_id: {
+        bankAccountId: {
             type: DataTypes.INTEGER,
             allowNull: false
         }
     });
 
-    const BankDetailsModel = db.define('bank_details', {
-        id: {
+    const BankDetailsModel = db.define('bankDetails', {
+        accountId: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true
         },
-        cash_balance: {
+        cashBalance: {
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 0
         },
-        credit_balance: {
+        creditBalance: {
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 0
         }
     });
 
+    UserModel.belongsTo(BankDetailsModel, { foreignKey: 'bankAccountId' });
 
-    db.sync({ force: true }).then(() => {
+    db.sync({ alter: true }).then(() => {
         console.log('Database & tables created!');
     });
 }

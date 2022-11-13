@@ -3,6 +3,7 @@ import { BaseHandler } from './BaseHandler'
 import { db } from '../app'
 import { IUser } from '../shared/interfaces'
 import { User } from '../../payment-typescript/payment'
+import { Model } from 'sequelize';
 
 
 
@@ -11,23 +12,23 @@ export class UserHandler extends BaseHandler {
         super()
     }
 
-    async get(_: any): Promise<IUser[]> {
-        return db.users.findAll()
+    async get(_: any): Promise<Model<any, any>[]> {
+        return db.models.users.findAll()
     }
 
-    async post(_: any, { name }: { name: string }): Promise<IUser[]> {
-        let newUser: IUser = new User(name)
-        db.users.create(newUser)
+    async post(_: any, { name }: { name: string }): Promise<Model<any, any>[]> {
+        let newUser: Omit<IUser, "id"> = new User(name)
+        db.models.users.create(newUser)
 
-        return db.users.findAll()
+        return db.models.users.findAll()
     }
 
-    async delete(_: any, { name }: { name: string }): Promise<IUser[]> {
-        let userIndex = await db.users.findOne({ where: { name: name } })
-        if (userIndex == -1) { throw new GraphQLError('User not found') }
-        db.users.destroy({ where: { name: name } })
+    async delete(_: any, { name }: { name: string }): Promise<Model<any, any>[]> {
+        let userIndex = await db.models.users.findOne({ where: { name: name } })
+        if (!userIndex) { throw new GraphQLError('User not found') }
+        db.models.users.destroy({ where: { name: name } })
 
-        return db.users.findAll()
+        return db.models.users.findAll()
     }
 
 

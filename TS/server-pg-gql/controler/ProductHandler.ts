@@ -3,6 +3,7 @@ import { BaseHandler } from './BaseHandler'
 import { db } from '../app'
 import { IProduct } from '../shared/interfaces'
 import { Product } from '../../payment-typescript/payment'
+import { Model } from 'sequelize';
 
 
 export class ProductHandler extends BaseHandler {
@@ -10,30 +11,30 @@ export class ProductHandler extends BaseHandler {
         super()
     }
 
-    async get(_: any): Promise<IProduct[]> {
-        return db.products.findAll()
+    async get(_: any): Promise<Model<any, any>[]> {
+        return db.models.products.findAll()
     }
 
-    async post(_: any, { name, price }: { name: string, price: number }): Promise<IProduct[]> {
-        let newProduct: IProduct = new Product(name, price)
-        db.products.create(newProduct)
+    async post(_: any, { name, price }: { name: string, price: number }): Promise<Model<any, any>[]> {
+        let newProduct: Omit<IProduct, "id"> = new Product(name, price)
+        db.models.products.create(newProduct)
 
-        return db.products.findAll()
+        return db.models.products.findAll()
     }
 
-    async delete(_: any, { name }: { name: string }): Promise<IProduct[]> {
-        let productIndex = await db.products.findOne({ where: { name: name } })
-        if (productIndex == -1) { throw new GraphQLError('Product not found') }
-        db.products.destroy({ where: { name: name } })
+    async delete(_: any, { name }: { name: string }): Promise<Model<any, any>[]> {
+        let productIndex = await db.models.products.findOne({ where: { name: name } })
+        if (!productIndex) { throw new GraphQLError('Product not found') }
+        db.models.products.destroy({ where: { name: name } })
 
-        return db.products.findAll()
+        return db.models.products.findAll()
     }
 
-    async patch(_: any, { name, price }: { name: string, price: number }): Promise<IProduct[]> {
-        let productIndex = await db.products.findOne({ where: { name: name } })
-        if (productIndex == -1) { throw new GraphQLError('Product not found') }
-        db.products.update({ price: price }, { where: { name: name } })
+    async patch(_: any, { name, price }: { name: string, price: number }): Promise<Model<any, any>[]> {
+        let productIndex = await db.models.products.findOne({ where: { name: name } })
+        if (!productIndex) { throw new GraphQLError('Product not found') }
+        db.models.products.update({ price: price }, { where: { name: name } })
 
-        return db.products.findAll()
+        return db.models.products.findAll()
     }
 }
