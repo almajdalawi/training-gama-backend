@@ -1,3 +1,5 @@
+import * as fs from 'fs'
+import * as path from 'path';
 import express from 'express'
 // import * as pg from 'pg'
 import { ApolloServer, ExpressContext } from "apollo-server-express";
@@ -9,9 +11,10 @@ import { productsSchema, productsResolvers } from './graphqlResolvers/productsRe
 import { purchaseSchema, purchaseResolvers } from './graphqlResolvers/purchaseResolvers'
 import { usersSchema, usersResolvers } from './graphqlResolvers/usersResolvers'
 import { withdrawSchema, withdrawResolvers } from './graphqlResolvers/withdrawResolvers'
-import { Sequelize } from 'sequelize';
+import { DataTypes, Sequelize } from 'sequelize';
 // import { dbAlterTables, UserModel, ProductModel, BankDetailsModel } from './db/models';
-import { DataTypes } from 'sequelize';
+import { Umzug, SequelizeStorage } from 'umzug';
+
 
 
 const port: number = parseInt(getEnv('PORT', 4000))
@@ -50,8 +53,31 @@ export const db = new Sequelize(dbCredentials.database, dbCredentials.user, dbCr
 
 
 
+// const umzug = new Umzug({
+//     migrations: { glob: 'migrations/*.js' },
+//     context: { queryInterface: db.getQueryInterface(), sequelize: db },
+//     storage: new SequelizeStorage({ sequelize: db }),
+//     logger: console,
+//     create: {
+//         folder: 'db/migrations',
+//         // template: (filepath: string) => [
+//         //     [filepath, fs.readFileSync(path.join(path.resolve(), 'db/template/simple-migrations.ts')).toString()],
+//         // ],
+//     },
+//     // migrations: {
+//     //     glob: ['build/db/migrations/*.js', { cwd: path.resolve() }],
+//     // },
+// });
+// export type Migration = typeof umzug._types.migration
 
-export const ProductModel = db.define('product', {
+// (async () => {
+//     console.log('**********************************')
+//     await umzug.up();
+// })();
+
+
+
+const ProductModel = db.define('product', {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -65,13 +91,9 @@ export const ProductModel = db.define('product', {
         type: DataTypes.INTEGER,
         allowNull: false
     }
-},
-    {
-        timestamps: false,
-    }
-);
+});
 
-export const UserModel = db.define('user', {
+const UserModel = db.define('user', {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -85,13 +107,9 @@ export const UserModel = db.define('user', {
         type: DataTypes.INTEGER,
         allowNull: false
     }
-},
-    {
-        timestamps: false,
-    }
-);
+});
 
-export const BankDetailsModel = db.define('bankDetails', {
+const BankDetailsModel = db.define('bankDetails', {
     accountId: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -107,12 +125,7 @@ export const BankDetailsModel = db.define('bankDetails', {
         allowNull: false,
         defaultValue: 0
     }
-},
-    {
-        timestamps: false,
-    }
-);
-
+});
 
 UserModel.belongsTo(BankDetailsModel, { foreignKey: 'bankAccountId' });
 
